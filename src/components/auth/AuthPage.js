@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -20,6 +20,7 @@ import AuthNavbar from "./AuthNavbar";
 export default function AuthPage() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [role, setRole] = useState("candidate"); // "candidate" | "company"
   const [mode, setMode] = useState("signin"); // "signup" | "signin"
   const [values, setValues] = useState({});
@@ -80,7 +81,13 @@ export default function AuthPage() {
         email: values.email, 
         role 
       });
-      router.push("/");
+      
+      const jobId = searchParams.get("jobId");
+      if (jobId) {
+        router.push(`/?jobId=${jobId}`);
+      } else {
+        router.push("/");
+      }
     }
   };
 
