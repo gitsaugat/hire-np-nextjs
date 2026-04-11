@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Search } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 
@@ -26,9 +25,8 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <LanguageToggle />
             <Link href="/auth" className="text-sm font-medium text-white/70 hover:text-white transition-colors hidden sm:block">{t('nav.signIn')}</Link>
-            <Link href="/auth" className="btn-find-jobs flex items-center gap-2 text-forest px-6 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300">
-              <Search size={16} />
-              Find Jobs
+            <Link href="/auth" className="btn-find-jobs flex items-center justify-center text-forest px-6 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300">
+              Get Started
             </Link>
           </div>
         </div>
