@@ -83,7 +83,9 @@ export default function AuthPage() {
       });
       
       const jobId = searchParams.get("jobId");
-      if (jobId) {
+      if (role === "company") {
+        router.push("/dashboard");
+      } else if (jobId) {
         router.push(`/?jobId=${jobId}`);
       } else {
         router.push("/");
@@ -103,17 +105,17 @@ export default function AuthPage() {
   const formKey = `${role}-${mode}`;
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#f7faf9] pt-24 pb-8 px-4 overflow-hidden">
+    <div className="relative min-h-screen flex items-center justify-center bg-white pt-24 pb-8 px-4 overflow-hidden">
       <AuthNavbar />
-      <div className="absolute inset-0 mesh-overlay opacity-30 pointer-events-none" />
+      <div className="absolute inset-0 mesh-overlay opacity-20 pointer-events-none" />
 
       {/* Atmospheric Watermark Blobs */}
       <div className="absolute top-20 left-[-10%] w-96 h-96 bg-teal/5 blur-[120px] rounded-full animate-float" />
       <div className="absolute bottom-20 right-[-5%] w-72 h-72 bg-forest/5 blur-[100px] rounded-full animate-float" />
 
       <div
-        className={`relative z-10 w-full bg-white rounded-[24px] px-8 py-10 border border-slate-100/80 max-[520px]:max-w-full max-[520px]:rounded-none max-[520px]:min-h-screen max-[520px]:px-5 max-[520px]:py-8 max-[520px]:flex max-[520px]:flex-col max-[520px]:justify-center transition-all duration-300 ${mode === "signup" ? "max-w-[640px]" : "max-w-[480px]"}`}
-        style={{ boxShadow: "0 20px 50px rgba(13,79,60,0.08), 0 0 0 1px rgba(13,79,60,0.02)" }}
+        className={`relative z-10 w-full bg-white rounded-[32px] px-8 py-10 max-[520px]:max-w-full max-[520px]:rounded-none max-[520px]:min-h-screen max-[520px]:px-5 max-[520px]:py-8 max-[520px]:flex max-[520px]:flex-col max-[520px]:justify-center transition-all duration-300 ${mode === "signup" ? "max-w-[640px]" : "max-w-[480px]"}`}
+        style={{ boxShadow: "0 30px 60px -12px rgba(13,79,60,0.12), 0 18px 36px -18px rgba(13,79,60,0.15)" }}
       >
 
         <RoleToggle role={role} setRole={switchRole} />

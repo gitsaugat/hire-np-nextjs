@@ -208,7 +208,7 @@ const UserDropdown = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-60 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 py-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute right-0 mt-3 w-60 bg-white rounded-2xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.15)] py-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
           {!isLoggedIn ? (
             <div className="p-2">
               <button
@@ -268,7 +268,7 @@ const Navbar = ({ query, setQuery }) => {
             <input
               type="text" value={query} onChange={(e) => setQuery(e.target.value)}
               placeholder="Search jobs, roles, or skills..."
-              className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-[#0f9e76]/5 focus:border-[#0f9e76] transition-all placeholder:text-slate-400"
+              className="w-full bg-[#f8fafc] rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-[#0f9e76]/5 transition-all placeholder:text-slate-400 font-medium"
             />
           </div>
         </div>
@@ -338,9 +338,9 @@ const FilterSection = ({ filters, setFilters }) => {
 const JobCard = ({ job, isActive, onClick }) => (
   <div
     onClick={() => onClick(job)}
-    className={`group relative p-4 mb-3 transition-all duration-300 border rounded-[20px] cursor-pointer overflow-hidden ${isActive
-        ? "bg-white border-[#0f9e76]/30 shadow-[0_15px_30px_rgba(0,0,0,0.06)] scale-[1.01]"
-        : "bg-white/50 border-slate-100 hover:border-slate-200 hover:bg-white hover:shadow-md"
+    className={`group relative p-4 mb-3 transition-all duration-300 rounded-[24px] cursor-pointer overflow-hidden ${isActive
+        ? "bg-white shadow-[0_20px_40px_-12px_rgba(13,79,60,0.12)] scale-[1.01]"
+        : "bg-white/40 hover:bg-white hover:shadow-lg"
       }`}
   >
     {/* Active indicator */}
@@ -407,9 +407,9 @@ const JobDetail = ({ job }) => {
   );
 
   return (
-    <div className="bg-white rounded-[24px] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] h-full flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-400">
+    <div className="bg-white rounded-[32px] shadow-[0_30px_60px_-12px_rgba(13,79,60,0.08)] h-full flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-400">
       {/* Compact Header */}
-      <div className="p-6 border-b border-slate-50 bg-gradient-to-br from-[#0f9e76]/5 via-white to-white relative overflow-hidden shrink-0">
+      <div className="p-6 bg-gradient-to-br from-[#0f9e76]/5 via-white to-white relative overflow-hidden shrink-0">
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#0f9e76]/5 rounded-full blur-2xl" />
 
         <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -482,7 +482,7 @@ const JobDetail = ({ job }) => {
             </div>
           </section>
 
-          <section className="bg-[#0d4f3c]/5 rounded-2xl p-6 border border-[#0d4f3c]/10 relative overflow-hidden">
+          <section className="bg-[#0d4f3c]/5 rounded-[24px] p-6 relative overflow-hidden">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1 h-4 bg-[#0d4f3c] rounded-full" />
               <h3 className="text-sm font-black text-[#0d4f3c] uppercase tracking-wider">Requirements</h3>

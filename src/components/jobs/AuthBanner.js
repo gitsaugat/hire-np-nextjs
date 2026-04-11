@@ -9,7 +9,7 @@ export default function AuthBanner({ isAuthenticated }) {
 
   return (
     <div className="mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300">
+      <div className="bg-white rounded-[24px] p-6 shadow-[0_20px_40px_-12px_rgba(13,79,60,0.12)] hover:shadow-[0_30px_60px_-12px_rgba(13,79,60,0.15)] transition-all duration-300">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-xl bg-teal/10 flex items-center justify-center shrink-0">
