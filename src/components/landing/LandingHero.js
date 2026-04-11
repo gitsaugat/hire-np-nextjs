@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 export default function LandingHero() {
@@ -21,12 +22,12 @@ export default function LandingHero() {
           {t('hero.subheadline')}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-          <button className="w-full sm:w-auto bg-aqua hover:bg-teal text-forest px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_0_20px_rgba(45,212,176,0.2)] hover:shadow-[0_0_30px_rgba(45,212,176,0.4)] active:scale-[0.98]">
+          <Link href="/auth" className="w-full sm:w-auto bg-aqua hover:bg-teal text-forest px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_0_20px_rgba(45,212,176,0.2)] hover:shadow-[0_0_30px_rgba(45,212,176,0.4)] active:scale-[0.98] text-center">
             {t('hero.cta.primary')}
-          </button>
-          <button className="w-full sm:w-auto border-2 border-white/30 hover:border-white/60 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 backdrop-blur-sm">
+          </Link>
+          <Link href="/auth" className="w-full sm:w-auto border-2 border-white/30 hover:border-white/60 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 backdrop-blur-sm text-center">
             {t('hero.cta.secondary')}
-          </button>
+          </Link>
         </div>
         <p className="pt-4 text-sm text-white/60 font-medium">
           {t('hero.tagline.prefix')} <span className="text-aqua">{t('hero.tagline.highlight')}</span>

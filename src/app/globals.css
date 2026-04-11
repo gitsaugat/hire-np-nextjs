@@ -82,3 +82,30 @@ body {
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+/* Find Jobs button — attention magnet */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(45, 212, 176, 0.3), 0 0 0 0 rgba(45, 212, 176, 0); }
+  50% { box-shadow: 0 0 16px rgba(45, 212, 176, 0.5), 0 0 24px rgba(45, 212, 176, 0.15); }
+}
+
+.btn-find-jobs {
+  position: relative;
+  overflow: hidden;
+  animation: glow-pulse 2.5s ease-in-out infinite;
+  background: linear-gradient(90deg, #2dd4b0 0%, #5eecd5 40%, #ffffff 50%, #5eecd5 60%, #2dd4b0 100%);
+  background-size: 200% 100%;
+  animation: glow-pulse 2.5s ease-in-out infinite, shimmer 3s ease-in-out infinite;
+}
+
+.btn-find-jobs:hover {
+  animation: none;
+  background: #0f9e76;
+  box-shadow: 0 0 24px rgba(45, 212, 176, 0.5);
+  transform: scale(1.05);
+}

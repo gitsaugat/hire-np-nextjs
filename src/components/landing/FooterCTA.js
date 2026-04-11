@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 export function FinalCTA() {
@@ -11,9 +12,9 @@ export function FinalCTA() {
       <div className="absolute inset-0 mesh-overlay opacity-40" />
       <div className="relative z-10 max-w-3xl mx-auto space-y-8">
         <h2 className="text-4xl md:text-5xl font-bold text-white">{t('finalCta.headline')}</h2>
-        <button className="bg-white text-forest px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 hover:bg-aqua-white shadow-lg hover:shadow-xl active:scale-[0.98]">
+        <Link href="/auth" className="inline-block bg-white text-forest px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 hover:bg-aqua-white shadow-lg hover:shadow-xl active:scale-[0.98]">
           {t('finalCta.cta')}
-        </button>
+        </Link>
       </div>
     </section>
   );

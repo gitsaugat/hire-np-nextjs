@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Check } from 'lucide-react';
+import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 function PricingCard({ tier, style, featureKeys }) {
@@ -71,9 +72,9 @@ function PricingCard({ tier, style, featureKeys }) {
       </ul>
 
       {/* CTA */}
-      <button className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${btnClass}`}>
+      <Link href="/auth" className={`block w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 text-center ${btnClass}`}>
         {t(`pricing.${tier}.cta`)}
-      </button>
+      </Link>
     </div>
   );
 }
