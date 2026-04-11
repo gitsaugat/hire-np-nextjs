@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
+import Logo from '@/components/Logo';
 
 export default function Navbar() {
   const { t } = useLanguage();
@@ -12,14 +13,14 @@ export default function Navbar() {
     <nav className="absolute top-0 left-0 right-0 z-50 w-full">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex justify-between items-center h-20">
-          <Link href="/" className="text-2xl font-bold text-white">
-            Hire<span className="text-aqua">NP</span>
+          <Link href="/">
+            <Logo textColor="text-white" />
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-sm font-medium text-white/70 hover:text-white transition-colors">{t('nav.features')}</Link>
-            <Link href="#how-it-works" className="text-sm font-medium text-white/70 hover:text-white transition-colors">{t('nav.howItWorks')}</Link>
-            <Link href="#pricing" className="text-sm font-medium text-white/70 hover:text-white transition-colors">{t('nav.pricing')}</Link>
+            <Link href="/landing#features" className="text-sm font-medium text-white/70 hover:text-white transition-colors">{t('nav.features')}</Link>
+            <Link href="/landing#how-it-works" className="text-sm font-medium text-white/70 hover:text-white transition-colors">{t('nav.howItWorks')}</Link>
+            <Link href="/landing#pricing" className="text-sm font-medium text-white/70 hover:text-white transition-colors">{t('nav.pricing')}</Link>
           </div>
 
           <div className="flex items-center gap-4">

@@ -2,6 +2,8 @@
 
 import React, { useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   validate,
@@ -13,10 +15,13 @@ import {
 import { fadeVariant } from "./AuthStyles";
 import RoleToggle from "./RoleToggle";
 import FormField from "./FormField";
+import AuthNavbar from "./AuthNavbar";
 
 export default function AuthPage() {
+  const { login } = useAuth();
+  const router = useRouter();
   const [role, setRole] = useState("candidate"); // "candidate" | "company"
-  const [mode, setMode] = useState("signup"); // "signup" | "signin"
+  const [mode, setMode] = useState("signin"); // "signup" | "signin"
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -69,8 +74,13 @@ export default function AuthPage() {
     setErrors(errs);
     setSubmitted(true);
     if (Object.keys(errs).length === 0) {
-      // TODO: wire up actual auth
-      console.log("Submit:", { role, mode, values });
+      // Simulated login success
+      login({ 
+        name: values.fullName || (role === "candidate" ? "Candidate User" : "Company Admin"), 
+        email: values.email, 
+        role 
+      });
+      router.push("/");
     }
   };
 
@@ -86,23 +96,18 @@ export default function AuthPage() {
   const formKey = `${role}-${mode}`;
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center hero-gradient py-8 px-4 overflow-hidden">
-      <div className="absolute inset-0 mesh-overlay opacity-60 pointer-events-none" />
+    <div className="relative min-h-screen flex items-center justify-center bg-[#f7faf9] pt-24 pb-8 px-4 overflow-hidden">
+      <AuthNavbar />
+      <div className="absolute inset-0 mesh-overlay opacity-30 pointer-events-none" />
 
-      <div className="absolute top-20 left-[-10%] w-96 h-96 bg-aqua/10 blur-[100px] rounded-full animate-float" />
-      <div className="absolute bottom-20 right-[-5%] w-72 h-72 bg-forest/20 blur-[80px] rounded-full animate-float" />
+      {/* Atmospheric Watermark Blobs */}
+      <div className="absolute top-20 left-[-10%] w-96 h-96 bg-teal/5 blur-[120px] rounded-full animate-float" />
+      <div className="absolute bottom-20 right-[-5%] w-72 h-72 bg-forest/5 blur-[100px] rounded-full animate-float" />
 
       <div
-        className={`relative z-10 w-full bg-white rounded-[20px] px-8 py-10 max-[520px]:max-w-full max-[520px]:rounded-none max-[520px]:min-h-screen max-[520px]:px-5 max-[520px]:py-8 max-[520px]:flex max-[520px]:flex-col max-[520px]:justify-center transition-all duration-300 ${mode === "signup" ? "max-w-[640px]" : "max-w-[480px]"}`}
-        style={{ boxShadow: "0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.08)" }}
+        className={`relative z-10 w-full bg-white rounded-[24px] px-8 py-10 border border-slate-100/80 max-[520px]:max-w-full max-[520px]:rounded-none max-[520px]:min-h-screen max-[520px]:px-5 max-[520px]:py-8 max-[520px]:flex max-[520px]:flex-col max-[520px]:justify-center transition-all duration-300 ${mode === "signup" ? "max-w-[640px]" : "max-w-[480px]"}`}
+        style={{ boxShadow: "0 20px 50px rgba(13,79,60,0.08), 0 0 0 1px rgba(13,79,60,0.02)" }}
       >
-        <Link
-          href="/"
-          className="block text-center text-[1.75rem] font-extrabold text-forest tracking-tight no-underline hover:opacity-80 transition-opacity mb-4"
-          id="auth-logo"
-        >
-          Hire<span className="text-teal">NP</span>
-        </Link>
 
         <RoleToggle role={role} setRole={switchRole} />
 
