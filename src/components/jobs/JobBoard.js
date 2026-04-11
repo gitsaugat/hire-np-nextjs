@@ -257,7 +257,7 @@ const Navbar = ({ query, setQuery }) => {
   const { isLoggedIn } = useAuth();
   return (
     <header className="sticky top-0 z-[60] w-full bg-white/70 backdrop-blur-xl border-b border-slate-100 px-4 md:px-8 py-3">
-      <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-6">
+      <div className="w-full mx-auto flex items-center justify-between gap-6 px-4 md:px-8">
         <Link href="/">
           <Logo textColor="text-[#0d4f3c]" />
         </Link>
@@ -532,7 +532,7 @@ export default function JobBoard() {
     <div className="min-h-screen bg-slate-50/50">
       <Navbar query={query} setQuery={setQuery} />
 
-      <main className="max-w-[1440px] mx-auto px-4 md:px-8 pt-6">
+      <main className="max-w-7xl mx-auto px-6 md:px-10 pt-6">
         <AuthBanner isAuthenticated={isLoggedIn} />
         <FilterSection filters={filters} setFilters={setFilters} />
 

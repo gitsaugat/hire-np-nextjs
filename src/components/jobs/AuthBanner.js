@@ -8,7 +8,7 @@ export default function AuthBanner({ isAuthenticated }) {
   if (isAuthenticated) return null;
 
   return (
-    <div className="max-w-[1440px] mx-auto mb-4 animate-in fade-in slide-in-from-top-4 duration-500 px-4">
+    <div className="mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-start gap-4">
