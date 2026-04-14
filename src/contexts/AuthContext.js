@@ -56,21 +56,20 @@ export function AuthProvider({ children }) {
         .from('users')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (userError) {
-        if (userError.code === 'PGRST116') {
-          console.warn('User record not found in public.users yet (might be waiting for trigger).');
-          // Fallback if the trigger hasn't finished yet
-          const combinedUser = { 
-            ...session.user, 
-            role: session.user.user_metadata?.role || 'candidate' 
-          };
-          setUser(combinedUser);
-          setIsLoggedIn(true);
-          return;
-        }
-        throw userError;
+      if (userError) throw userError;
+
+      if (!dbUser) {
+        console.warn('User record not found in public.users yet (might be waiting for trigger).');
+        // Fallback if the trigger hasn't finished yet
+        const combinedUser = { 
+          ...session.user, 
+          role: session.user.user_metadata?.role || 'candidate' 
+        };
+        setUser(combinedUser);
+        setIsLoggedIn(true);
+        return;
       }
 
       let extraData = {};
@@ -81,7 +80,7 @@ export function AuthProvider({ children }) {
           .from('candidate_profiles')
           .select('*')
           .eq('user_id', dbUser.id)
-          .single();
+          .maybeSingle();
         extraData = profile || {};
       } else if (dbUser.role === 'company_admin' || dbUser.role === 'company') {
         // 2b. Fetch company details for company admins
@@ -89,7 +88,7 @@ export function AuthProvider({ children }) {
           .from('company_members')
           .select('*, companies(*)')
           .eq('user_id', dbUser.id)
-          .single();
+          .maybeSingle();
         
         if (membership?.companies) {
           extraData = {
@@ -97,7 +96,6 @@ export function AuthProvider({ children }) {
             company_id: membership.companies.id
           };
         }
-
       }
 
       const combinedUser = {

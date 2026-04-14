@@ -1,131 +1,89 @@
 "use client";
 
 import React, { useState } from "react";
-import { Upload, FileText, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Loader2, Sparkles, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useProfile } from "@/contexts/ProfileContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
+import { extractTextFromPDF } from "@/lib/pdfParser";
+import { analyzeResume } from "@/lib/resumeAnalyzer";
 
 export default function ResumeUploadCard({ onDataExtracted }) {
+  const { user } = useAuth();
   const { isParsing, setParsing: setIsParsing } = useProfile();
   const [file, setFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState(null);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      simulateUpload(selectedFile);
+      if (selectedFile.type !== "application/pdf") {
+        setError("Please upload a PDF file for accurate AI parsing.");
+        return;
+      }
+      setError(null);
+      performRealUpload(selectedFile);
     }
   };
 
-  const simulateUpload = (selectedFile) => {
+  const performRealUpload = async (selectedFile) => {
+    if (!user) {
+      setError("Please log in to upload resumes.");
+      return;
+    }
+
     setFile(selectedFile);
     setUploadProgress(0);
-    
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      if (progress >= 100) {
-        clearInterval(interval);
-        setUploadProgress(100);
-        startParsing();
-      } else {
-        setUploadProgress(progress);
-      }
-    }, 100);
-  };
-
-  /**
-   * High-Fidelity AI Resume Extraction Logic
-   * Uses a scoring matrix to determine role, skills, and seniority
-   */
-  const analyzeResume = (fileName) => {
-    const lowerName = fileName.toLowerCase();
-    
-    // 1. Clean Name Parsing
-    const nameCleaner = (str) => {
-      return str.split(/[-_.]/)[0]
-        .replace(/[0-9]/g, '')
-        .split(' ')
-        .map(s => s.charAt(0).toUpperCase() + s.slice(1))
-        .join(' ')
-        .trim();
-    };
-    const extractedName = nameCleaner(fileName) || "Candidate Profile";
-
-    // 2. Keyword Matrix
-    const matrix = [
-      { 
-        keys: ["react", "frontend", "web", "nextjs", "javascript", "typescript"], 
-        role: "Frontend Engineer", 
-        skills: ["React.js", "Next.js", "TypeScript", "Tailwind CSS", "Redux", "Jest"],
-        description: "Specialized in building high-performance, accessible web interfaces."
-      },
-      { 
-        keys: ["node", "backend", "python", "django", "express", "go", "api"], 
-        role: "Backend Engineer", 
-        skills: ["Node.js", "Python", "PostgreSQL", "Redis", "Docker", "Microservices"],
-        description: "Expert in architecting scalable server-side systems and RESTful APIs."
-      },
-      { 
-        keys: ["mobile", "react native", "flutter", "ios", "android", "swift"], 
-        role: "Mobile Developer", 
-        skills: ["React Native", "Flutter", "SwiftUI", "Firebase", "App Store Deployment"],
-        description: "Focused on creating fluid cross-platform mobile experiences."
-      },
-      { 
-        keys: ["devops", "aws", "kubernetes", "cloud", "azure", "ci/cd", "terraform"], 
-        role: "DevOps Engineer", 
-        skills: ["AWS", "Kubernetes", "Terraform", "GitHub Actions", "Cloud Architecture"],
-        description: "Infrastructure automation and cloud platform optimization."
-      },
-      { 
-        keys: ["data", "ml", "ai", "pandas", "scientist", "tensorflow", "pytorch"], 
-        role: "Data Scientist", 
-        skills: ["Python", "TensorFlow", "Pandas", "PyTorch", "SQL", "Big Data"],
-        description: "Leveraging machine learning models to extract actionable insights."
-      }
-    ];
-
-    // Find best match
-    let match = matrix.find(m => m.keys.some(k => lowerName.includes(k))) || matrix[0];
-    
-    // 3. Seniority Detection
-    let level = "junior";
-    if (lowerName.includes("senior") || lowerName.includes("expert") || lowerName.includes("lead")) level = "senior";
-    else if (lowerName.includes("mid") || lowerName.includes("intermediate")) level = "mid";
-
-    // 4. Construct AI Data
-    return {
-      full_name: extractedName,
-      location: "Kathmandu, Nepal",
-      bio: `Professional ${match.role} with a focus on ${match.skills.slice(0, 3).join(", ")}. ${match.description}`,
-      experience_level: level.charAt(0).toUpperCase() + level.slice(1),
-      skills: match.skills,
-      experience: [
-        { 
-          role: match.role, 
-          company: "Software Systems Nepal", 
-          duration: level === "senior" ? "5+ Years" : "2-3 Years", 
-          description: match.description 
-        }
-      ],
-      education: [{ degree: "BE in Computer Engineering", institution: "Institute of Engineering, Pulchowk", year: "2019" }],
-      preferred_roles: [match.role, "Software Engineer", "Full Stack Developer"],
-      salary_expectation: "$1200 - $2500 / month",
-      job_preferences: { location_type: "Hybrid", job_type: "Full-time" }
-    };
-  };
-
-  const startParsing = async () => {
     setIsParsing(true);
-    
-    // Simulate AI Parsing Latency
-    setTimeout(() => {
-      const extractedData = analyzeResume(file?.name || "Candidate_Resume.pdf");
-      onDataExtracted(extractedData);
+
+    try {
+      setUploadProgress(20);
+
+      const fileExt = selectedFile.name.split('.').pop();
+      console.log(user, "resume");
+      // Corrected format: user_id/timestamp-filename
+      const filePath = `${user.user_id}/${Date.now()}-${selectedFile.name}`;
+
+      // 1. Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from("resumes")
+        .upload(filePath, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      setUploadProgress(60);
+
+      // 2. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("resumes")
+        .getPublicUrl(filePath);
+
+      setUploadProgress(80);
+
+      // 3. Extract Text from PDF
+      const text = await extractTextFromPDF(selectedFile);
+
+      // 4. Analyze using shared utility
+      const extractedData = analyzeResume(selectedFile.name, text);
+
+      // 5. Add URL
+      const finalData = { ...extractedData, resume_url: publicUrl };
+
+      setUploadProgress(100);
+
+      setTimeout(() => {
+        onDataExtracted(finalData);
+        setIsParsing(false);
+      }, 1000);
+
+    } catch (err) {
+      console.error("Upload/Parse error:", err);
+      setError(err.message || "Failed to process resume. Please try again.");
       setIsParsing(false);
-    }, 2800);
+    }
   };
 
   return (
@@ -138,6 +96,13 @@ export default function ResumeUploadCard({ onDataExtracted }) {
       </div>
 
       <div className="space-y-4">
+        {error && (
+          <div className="p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 text-xs font-bold animate-in fade-in slide-in-from-top-1">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
         {!file ? (
           <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-200 rounded-[24px] cursor-pointer hover:bg-slate-50 hover:border-[#0f9e76]/30 transition-all group">
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -166,9 +131,8 @@ export default function ResumeUploadCard({ onDataExtracted }) {
               )}
             </div>
 
-            {/* Progress Bar */}
             <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-              <motion.div 
+              <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${uploadProgress}%` }}
                 className="h-full bg-gradient-to-r from-[#0d4f3c] to-[#0f9e76]"
@@ -179,7 +143,7 @@ export default function ResumeUploadCard({ onDataExtracted }) {
 
         <AnimatePresence>
           {isParsing && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

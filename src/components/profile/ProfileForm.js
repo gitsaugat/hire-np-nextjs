@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { User, MapPin, AlignLeft, BarChart, HardHat, DollarSign, Globe, Briefcase, Save, Loader2, Sparkles, Building2 } from "lucide-react";
+import { Save, Loader2, Upload, Sparkles, FileText } from "lucide-react";
+import Link from "next/link";
 import SkillTags from "./SkillTags";
 import ExperienceSection from "./ExperienceSection";
 import EducationSection from "./EducationSection";
+import { extractTextFromPDF } from "@/lib/pdfParser";
+import { analyzeResume } from "@/lib/resumeAnalyzer";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export default function ProfileForm({ profile: initialProfile, onSave, isSaving }) {
+  const { parsing: isParsing, setParsing: setIsParsing, showToast } = useProfile();
   const [formData, setFormData] = useState(initialProfile);
 
   useEffect(() => {
@@ -29,189 +34,184 @@ export default function ProfileForm({ profile: initialProfile, onSave, isSaving 
     setFormData((prev) => ({ ...prev, [field]: newList }));
   };
 
+  const handleAIFill = async () => {
+    if (!formData?.resume_url) {
+      showToast("Please link a resume first", "error");
+      return;
+    }
+
+    try {
+      setIsParsing(true);
+
+      // 1. Fetch file from URL
+      const response = await fetch(formData.resume_url);
+      const blob = await response.blob();
+
+      // 2. Extract Text
+      const text = await extractTextFromPDF(blob);
+
+      // 3. Analyze
+      const fileName = formData.resume_url.split('/').pop() || "resume.pdf";
+      const AIProfile = analyzeResume(fileName, text);
+
+      // 4. Optimistic Update (keeping current identifier fields)
+      setFormData(prev => ({
+        ...prev,
+        ...AIProfile,
+      }));
+
+      showToast("Profile auto-filled successfully!");
+    } catch (error) {
+      console.error("AI Fill error:", error);
+      showToast("Failed to parse resume. Try manually uploading or refreshing.", "error");
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 pb-20">
-      {/* Basic Info Section */}
-      <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-        <h3 className="text-xl font-black text-[#0d4f3c] tracking-tight mb-8">Basic Information</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Full Name</label>
-            <div className="relative">
-              <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
-              <input 
-                type="text" name="full_name" value={formData?.full_name || ""} onChange={handleChange}
-                placeholder="e.g. Alex Thompson"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3.5 pl-11 pr-4 text-sm font-bold text-[#0d4f3c] focus:outline-none focus:ring-4 focus:ring-[#0f9e76]/5 transition-all"
-              />
-            </div>
+    <form onSubmit={handleSubmit} className="space-y-10">
+      {/* 1. Basic Information */}
+      <div className="space-y-6">
+        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Basic Information</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700">Full Name</label>
+            <input
+              type="text"
+              name="full_name"
+              value={formData?.full_name || ""}
+              onChange={handleChange}
+              placeholder="e.g. Alex Thompson"
+              className="w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Location</label>
-            <div className="relative">
-              <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
-              <input 
-                type="text" name="location" value={formData?.location || ""} onChange={handleChange}
-                placeholder="e.g. Kathmandu, Nepal"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3.5 pl-11 pr-4 text-sm font-bold text-[#0d4f3c] focus:outline-none focus:ring-4 focus:ring-[#0f9e76]/5 transition-all"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-1.5 mb-8">
-          <div className="flex items-center justify-between pl-1">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Professional Bio</label>
-            <button type="button" className="text-[10px] font-black tracking-wider text-[#0f9e76] uppercase hover:underline flex items-center gap-1 group">
-              <Sparkles size={10} className="group-hover:rotate-12 transition-transform" /> Enhance with AI
-            </button>
-          </div>
-          <div className="relative">
-            <AlignLeft size={16} className="absolute left-4 top-4 text-slate-300" />
-            <textarea 
-              name="bio" value={formData?.bio || ""} onChange={handleChange}
-              placeholder="Tell your professional story..."
-              rows={4}
-              className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3.5 pl-11 pr-4 text-sm font-medium text-[#0d4f3c] focus:outline-none focus:ring-4 focus:ring-[#0f9e76]/5 transition-all resize-none"
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700">Location</label>
+            <input
+              type="text"
+              name="location"
+              value={formData?.location || ""}
+              onChange={handleChange}
+              placeholder="e.g. Kathmandu, Nepal"
+              className="w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
             />
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Experience Level</label>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { id: "junior", label: "Junior" },
-              { id: "mid", label: "Intermediate" },
-              { id: "senior", label: "Senior" }
-            ].map((level) => (
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-slate-700">Professional Bio</label>
+          <textarea
+            name="bio"
+            value={formData?.bio || ""}
+            onChange={handleChange}
+            placeholder="Introduce yourself..."
+            rows={4}
+            className="w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 resize-none"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-slate-700">Experience Level</label>
+          <div className="flex gap-2">
+            {["junior", "mid", "senior"].map((level) => (
               <button
-                key={level.id}
+                key={level}
                 type="button"
-                onClick={() => handleChange({ target: { name: "experience_level", value: level.id } })}
-                className={`py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
-                  formData?.experience_level === level.id 
-                    ? "bg-[#0d4f3c] text-white border-[#0d4f3c] shadow-lg shadow-teal/20" 
-                    : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"
-                }`}
+                onClick={() => handleChange({ target: { name: "experience_level", value: level } })}
+                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all ${formData?.experience_level === level
+                  ? "bg-slate-900 text-white border-slate-900"
+                  : "bg-white text-slate-500 border-slate-100 hover:bg-slate-50"
+                  }`}
               >
-                {level.label}
+                {level}
               </button>
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Skills Section */}
-      <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-        <h3 className="text-xl font-black text-[#0d4f3c] tracking-tight mb-8">Skills & Expertise</h3>
-        <SkillTags 
-          skills={formData?.skills || []} 
-          setSkills={(newList) => handleUpdateList("skills", newList)} 
+      <div className="h-px bg-slate-100" />
+
+      {/* 2. Skills */}
+      <div className="space-y-6">
+        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Skills & Expertise</h4>
+        <SkillTags
+          skills={formData?.skills || []}
+          setSkills={(newList) => handleUpdateList("skills", newList)}
         />
-      </section>
+      </div>
 
-      {/* Work Experience */}
-      <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-        <h3 className="text-xl font-black text-[#0d4f3c] tracking-tight mb-8">Work History</h3>
-        <ExperienceSection 
-          experience={formData?.experience || []} 
-          setExperience={(newList) => handleUpdateList("experience", newList)} 
+      <div className="h-px bg-slate-100" />
+
+      {/* 3. Work & Education */}
+      <div className="grid grid-cols-1 gap-10">
+        <ExperienceSection
+          experience={formData?.experience || []}
+          setExperience={(newList) => handleUpdateList("experience", newList)}
         />
-      </section>
 
-      {/* Education */}
-      <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-        <h3 className="text-xl font-black text-[#0d4f3c] tracking-tight mb-8">Education</h3>
-        <EducationSection 
-          education={formData?.education || []} 
-          setEducation={(newList) => handleUpdateList("education", newList)} 
+        <div className="h-px bg-slate-100" />
+
+        <EducationSection
+          education={formData?.education || []}
+          setEducation={(newList) => handleUpdateList("education", newList)}
         />
-      </section>
+      </div>
 
-      {/* Job Preferences */}
-      <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-        <h3 className="text-xl font-black text-[#0d4f3c] tracking-tight mb-8">Job Preferences</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Salary Expectation (Monthly)</label>
-              <div className="relative">
-                <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
-                <input 
-                  type="text" name="salary_expectation" value={formData?.salary_expectation || ""} onChange={handleChange}
-                  placeholder="e.g. $2000 - $3500"
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3.5 pl-11 pr-4 text-sm font-bold text-[#0d4f3c] focus:outline-none focus:ring-4 focus:ring-[#0f9e76]/5 transition-all"
-                />
-              </div>
+      <div className="h-px bg-slate-100" />
+
+      {/* 4. Active Resume */}
+      <div className="space-y-4">
+        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Resume</h4>
+        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${formData?.resume_url ? "bg-emerald-50 text-emerald-600" : "bg-white text-slate-400 border border-slate-100"}`}>
+              <FileText size={20} />
             </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Location Type</label>
-              <div className="flex gap-2">
-                {["Remote", "Onsite", "Hybrid"].map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => handleDeepChange("job_preferences", "location_type", type)}
-                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border ${
-                      formData?.job_preferences?.location_type === type 
-                        ? "bg-[#0f9e76]/10 text-[#0f9e76] border-[#0f9e76]" 
-                        : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
+            <div className="min-w-0">
+              <span className="text-sm font-bold text-slate-700 block truncate">
+                {formData?.resume_url ? "Primary Resume linked" : "No resume uploaded"}
+              </span>
+              <Link
+                href="/profile/resumes"
+                className="text-[10px] font-black uppercase text-emerald-600 hover:text-emerald-700 transition-colors"
+              >
+                Manage Resumes
+              </Link>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Employment Type</label>
-              <div className="flex gap-2">
-                {["Full-time", "Contract", "Freelance"].map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => handleDeepChange("job_preferences", "job_type", type)}
-                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border ${
-                      formData?.job_preferences?.job_type === type 
-                        ? "bg-[#0f9e76]/10 text-[#0f9e76] border-[#0f9e76]" 
-                        : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          {formData?.resume_url && (
+            <button
+              type="button"
+              disabled={isParsing}
+              onClick={handleAIFill}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 shadow-sm rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              {isParsing ? <Loader2 className="animate-spin" size={14} /> : <Sparkles className="text-emerald-500" size={14} />}
+              {isParsing ? "Analyzing..." : "Fill with AI"}
+            </button>
+          )}
         </div>
-      </section>
+      </div>
 
-      {/* Sticky Save Bar */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4">
+      {/* 5. Save Button */}
+      <div className="pt-8 border-t border-slate-100 flex justify-end">
         <button
           type="submit"
           disabled={isSaving}
-          className="w-full h-14 bg-[#0d4f3c] text-white rounded-[20px] font-black uppercase tracking-[2px] text-sm shadow-[0_20px_40px_-12px_rgba(13,79,60,0.4)] hover:bg-[#0f9e76] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
+          className="flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-50"
         >
-          {isSaving ? (
-            <Loader2 className="animate-spin" size={18} />
-          ) : (
-            <Save size={18} className="group-hover:-translate-y-0.5 transition-transform" />
-          )}
-          {isSaving ? "Saving Progress..." : "Save Profile"}
+          {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+          {isSaving ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </form>

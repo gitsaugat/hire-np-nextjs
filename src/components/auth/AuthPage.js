@@ -115,10 +115,10 @@ export default function AuthPage() {
           const userId = authData.user.id;
 
           if (role === "candidate") {
-            // 2a. Create candidate profile in normalized table
+            // 2a. Create candidate profile in normalized table (Upsert to handle potential retries)
             const { error: profileErr } = await supabase
               .from('candidate_profiles')
-              .insert([
+              .upsert(
                 {
                   user_id: userId,
                   full_name: values.fullName,
@@ -127,8 +127,9 @@ export default function AuthPage() {
                   education: [],
                   preferred_roles: [],
                   job_preferences: { location_type: "", job_type: "" }
-                }
-              ]);
+                },
+                { onConflict: 'user_id' }
+              );
 
             if (profileErr) throw profileErr;
           } else {

@@ -20,11 +20,11 @@ export default function SkillTags({ skills, setSkills }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2 min-h-[48px] p-3 bg-slate-50 rounded-2xl border border-slate-100">
+      <div className="flex flex-wrap gap-2 min-h-[48px] p-2 bg-gray-50/50 rounded-xl">
         {skills.map((skill) => (
           <div
             key={skill}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-[#0d4f3c] shadow-sm animate-in fade-in zoom-in-95 duration-200"
+            className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-slate-700 transition-colors animate-in fade-in zoom-in-95 duration-200"
           >
             {skill}
             <button
@@ -51,13 +51,13 @@ export default function SkillTags({ skills, setSkills }) {
               addSkill(e);
             }
           }}
-          placeholder="Add a skill (e.g. React, Python)"
-          className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f9e76]/20 focus:border-[#0f9e76] transition-all font-medium"
+          placeholder="Add a skill..."
+          className="flex-1 bg-gray-50 border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#0f9e76]/10 transition-all font-medium"
         />
         <button
           type="button"
           onClick={addSkill}
-          className="px-4 py-2.5 bg-[#0d4f3c] text-white rounded-xl hover:bg-[#0f9e76] transition-all active:scale-95 shadow-md shadow-teal/10"
+          className="px-4 py-2.5 bg-[#0d4f3c] text-white rounded-lg hover:bg-emerald-600 transition-all active:scale-95"
         >
           <Plus size={18} />
         </button>
