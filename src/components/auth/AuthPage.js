@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,12 +16,23 @@ import {
 import { fadeVariant } from "./AuthStyles";
 import RoleToggle from "./RoleToggle";
 import FormField from "./FormField";
-import AuthNavbar from "./AuthNavbar";
+import Navbar from "../Navbar";
 
 export default function AuthPage() {
-  const { login } = useAuth();
+  const { user, isLoggedIn, isLoading, login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!isLoading && isLoggedIn) {
+      if (user?.role === 'company' || user?.role === 'company_admin') {
+        router.push("/dashboard");
+      } else {
+        const jobId = searchParams.get("jobId");
+        router.push(jobId ? `/?jobId=${jobId}` : "/");
+      }
+    }
+  }, [user, isLoggedIn, isLoading, router, searchParams]);
   const [role, setRole] = useState("candidate"); // "candidate" | "company"
   const [mode, setMode] = useState("signin"); // "signup" | "signin"
   const [values, setValues] = useState({});
@@ -104,13 +115,18 @@ export default function AuthPage() {
           const userId = authData.user.id;
 
           if (role === "candidate") {
-            // 2a. Create candidate profile
+            // 2a. Create candidate profile in normalized table
             const { error: profileErr } = await supabase
-              .from('profiles')
+              .from('candidate_profiles')
               .insert([
                 {
                   user_id: userId,
                   full_name: values.fullName,
+                  skills: [],
+                  experience: [],
+                  education: [],
+                  preferred_roles: [],
+                  job_preferences: { location_type: "", job_type: "" }
                 }
               ]);
 
@@ -180,7 +196,7 @@ export default function AuthPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-white pt-24 pb-8 px-4 overflow-hidden">
-      <AuthNavbar />
+      <Navbar showSearch={false} />
       <div className="absolute inset-0 mesh-overlay opacity-20 pointer-events-none" />
 
       {/* Atmospheric Watermark Blobs */}

@@ -1,3 +1,21 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
+import { 
+  Search, 
+  Zap, 
+  Briefcase, 
+  Mail, 
+  Phone, 
+  MoreVertical, 
+  Clock, 
+  CheckCircle2, 
+  Users 
+} from "lucide-react";
+
 export default function ApplicantsPage() {
   const { user, isLoggedIn, isLoading } = useAuth();
   const router = useRouter();
@@ -34,20 +52,29 @@ export default function ApplicantsPage() {
           .from('applications')
           .select(`
             *,
-            profiles (full_name, email, phone),
+            users:user_id (
+              email,
+              profiles (full_name, location)
+            ),
             jobs (title),
-            application_ai_data (score)
+            application_ai_data (match_score)
           `)
           .in('job_id', jobIds)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
         
-        // Flatten AI score
-        const processedApps = data.map(app => ({
-          ...app,
-          ai_score: app.application_ai_data?.[0]?.score || 0
-        }));
+        // Flatten data
+        const processedApps = data.map(app => {
+          const profile = app.users?.profiles?.[0];
+          return {
+            ...app,
+            profiles: profile,
+            full_name: profile?.full_name || app.users?.email || 'Unknown',
+            email: app.users?.email,
+            ai_score: app.application_ai_data?.[0]?.match_score || 0
+          };
+        });
         
         setApplicants(processedApps || []);
       }
@@ -141,11 +168,11 @@ export default function ApplicantsPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-forest/5 text-forest rounded-2xl flex items-center justify-center font-bold text-xl uppercase">
-                  {app.profiles?.full_name?.split(' ').map(n => n[0]).join('') || "?"}
+                  {app.full_name?.split(' ').map(n => n[0]).join('') || "?"}
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-forest group-hover:text-teal transition-colors">
-                    {app.profiles?.full_name}
+                    {app.full_name}
                   </h3>
                   <div className="flex flex-wrap items-center gap-4 mt-1 text-sm text-text-muted font-medium">
                     <span className={`flex items-center gap-1.5 font-bold px-2 py-0.5 rounded-lg ${
@@ -163,14 +190,16 @@ export default function ApplicantsPage() {
               </div>
               
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] border border-[#f1f5f9] rounded-xl text-text-muted">
-                  <Mail size={16} />
-                  <span className="text-xs font-bold">{app.profiles?.email}</span>
-                </div>
-                {app.profiles?.phone && (
+                {app.email && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] border border-[#f1f5f9] rounded-xl text-text-muted">
+                    <Mail size={16} />
+                    <span className="text-xs font-bold">{app.email}</span>
+                  </div>
+                )}
+                {app.profiles?.location && (
                   <div className="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] border border-[#f1f5f9] rounded-xl text-text-muted">
                     <Phone size={16} />
-                    <span className="text-xs font-bold">{app.profiles?.phone}</span>
+                    <span className="text-xs font-bold">{app.profiles?.location}</span>
                   </div>
                 )}
                 <button className="p-2 hover:bg-[#f8fafc] rounded-lg text-text-muted transition-colors">

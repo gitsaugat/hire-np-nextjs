@@ -4,8 +4,9 @@ import React, { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useJobs } from "@/contexts/JobContext";
 import { supabase } from "@/lib/supabaseClient";
-import Logo from "@/components/Logo";
+import Navbar from "@/components/Navbar";
 import AuthBanner from "./AuthBanner";
 import ChatPopup from "./ChatPopup";
 import {
@@ -28,124 +29,9 @@ import {
 } from "lucide-react";
 
 const FILTER_OPTIONS = {
-  type: ["Full-time", "Part-time", "Contract"],
-  location: ["Remote", "Onsite", "Hybrid"],
-  experience: ["Junior", "Mid", "Senior"]
-};
-
-const UserDropdown = () => {
-  const { isLoggedIn, logout, user } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) setIsOpen(false);
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 rounded-full bg-slate-100 p-0.5 shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center border border-slate-200"
-      >
-        <User size={20} className="text-slate-400" />
-      </button>
-
-      {isOpen && (
-        <div className="absolute right-0 mt-3 w-60 bg-white rounded-2xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.15)] py-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-          {!isLoggedIn ? (
-            <div className="p-2">
-              <button
-                onClick={() => router.push("/auth")}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-[#0d4f3c] hover:bg-slate-50 rounded-xl transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full bg-[#0f9e76]/10 flex items-center justify-center">
-                  <User size={16} className="text-[#0f9e76]" />
-                </div>
-                Sign In
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="px-4 py-3 border-b border-slate-50 mb-1 text-left">
-                <p className="text-sm font-bold text-[#0d4f3c]">{user?.full_name || user?.email || "Member"}</p>
-                <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
-              </div>
-              {[
-                { label: "Profile", icon: User },
-                { label: "My Applications", icon: FileText },
-                { label: "Settings", icon: Settings },
-                { label: "Logout", icon: LogOut, danger: true, onClick: logout },
-              ].map((item) => (
-                <button
-                  key={item.label}
-                  onClick={item.onClick}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${item.danger ? "text-red-500 hover:bg-red-50" : "text-slate-600 hover:bg-slate-50"}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon size={16} /> {item.label}
-                  </div>
-                </button>
-              ))}
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-
-const Navbar = ({ query, setQuery }) => {
-  const { isLoggedIn } = useAuth();
-  return (
-    <header className="sticky top-0 z-[60] w-full bg-white/70 backdrop-blur-xl border-b border-slate-100 px-4 md:px-8 py-3">
-      <div className="w-full mx-auto flex items-center justify-between gap-6 px-4 md:px-8">
-        <Link href="/">
-          <Logo textColor="text-[#0d4f3c]" />
-        </Link>
-
-        <div className="flex-1 max-w-xl hidden md:block">
-          <div className="relative group">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0f9e76] transition-colors" />
-            <input
-              type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search jobs, roles, or skills..."
-              className="w-full bg-[#f8fafc] rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-[#0f9e76]/5 transition-all placeholder:text-slate-400 font-medium"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-5">
-          <div className="hidden lg:flex items-center gap-6 mr-2">
-            <a href="#" className="text-sm font-semibold text-slate-600 hover:text-[#0f9e76] transition-colors">Find Jobs</a>
-            <a href="#" className="text-sm font-semibold text-slate-600 hover:text-[#0f9e76] transition-colors">Companies</a>
-          </div>
-          {isLoggedIn ? (
-            <>
-              <button className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-[#0d4f3c] text-white text-xs font-bold rounded-xl hover:bg-[#0f9e76] transition-all shadow-md shadow-teal/10">
-                Post Job
-              </button>
-              <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
-              <UserDropdown />
-            </>
-          ) : (
-            <Link
-              href="/auth"
-              className="hidden sm:inline-flex items-center gap-2 px-6 py-2.5 bg-[#0d4f3c] text-white text-xs font-bold rounded-xl hover:bg-[#0f9e76] transition-all shadow-md shadow-teal/10"
-            >
-              Sign In
-            </Link>
-          )}
-        </div>
-      </div>
-    </header>
-  );
+  type: ["Full-time", "Part-time", "Contract", "Freelance", "Internship"],
+  location: ["Remote", "Kathmandu", "Lalitpur", "Pokhara"],
+  experience: ["Junior", "Intermediate", "Senior", "Expert"]
 };
 const FilterSection = ({ filters, setFilters }) => {
   const toggleFilter = (key, value) => setFilters(prev => ({ ...prev, [key]: prev[key] === value ? "" : value }));
@@ -161,8 +47,8 @@ const FilterSection = ({ filters, setFilters }) => {
           {options.map(option => (
             <button key={option} onClick={() => toggleFilter(key, option)}
               className={`px-4 py-2 rounded-xl text-[11px] font-bold border transition-all duration-200 ${filters[key] === option
-                  ? "bg-[#0d4f3c] border-[#0d4f3c] text-white shadow-lg shadow-[#0d4f3c]/20 scale-[1.02]"
-                  : "bg-white border-slate-200 text-slate-500 hover:border-[#0f9e76] hover:text-[#0f9e76] hover:shadow-sm"
+                ? "bg-[#0d4f3c] border-[#0d4f3c] text-white shadow-lg shadow-[#0d4f3c]/20 scale-[1.02]"
+                : "bg-white border-slate-200 text-slate-500 hover:border-[#0f9e76] hover:text-[#0f9e76] hover:shadow-sm"
                 }`}
             >
               {option}
@@ -183,12 +69,49 @@ const FilterSection = ({ filters, setFilters }) => {
   );
 };
 
+// Helper to parse job details from flat description
+export const parseJobDetails = (job) => {
+  if (!job?.description) return { mission: "", requirements: [], competencies: [] };
+
+  let text = job.description;
+  const requirements = [];
+  const competencies = [];
+
+  // 1. Extract Requirements
+  const reqMatch = text.match(/Requirements:([\s\S]*?)(Responsibilities:|$)/i);
+  if (reqMatch) {
+    const rawReqs = reqMatch[1].trim().split('\n');
+    rawReqs.forEach(r => {
+      const clean = r.replace(/^[•\-\*]\s*/, '').trim();
+      if (clean) requirements.push(clean);
+    });
+    text = text.replace(reqMatch[0], '').trim();
+  }
+
+  // 2. Extract Responsibilities/Competencies
+  const resMatch = text.match(/Responsibilities:([\s\S]*?)(Requirements:|$)/i);
+  if (resMatch) {
+    const rawRes = resMatch[1].trim().split('\n');
+    rawRes.forEach(r => {
+      const clean = r.replace(/^[•\-\*]\s*/, '').trim();
+      if (clean) competencies.push(clean);
+    });
+    text = text.replace(resMatch[0], '').trim();
+  }
+
+  return {
+    mission: text || job.description,
+    requirements: requirements.length > 0 ? requirements : (job.requirements || []),
+    competencies: competencies.length > 0 ? competencies : (job.responsibilities || [])
+  };
+};
+
 const JobCard = ({ job, isActive, onClick }) => (
   <div
     onClick={() => onClick(job)}
     className={`group relative p-4 mb-3 transition-all duration-300 rounded-[24px] cursor-pointer overflow-hidden ${isActive
-        ? "bg-white shadow-[0_20px_40px_-12px_rgba(13,79,60,0.12)] scale-[1.01]"
-        : "bg-white/40 hover:bg-white hover:shadow-lg"
+      ? "bg-white shadow-[0_20px_40px_-12px_rgba(13,79,60,0.12)] scale-[1.01]"
+      : "bg-white/40 hover:bg-white hover:shadow-lg"
       }`}
   >
     {/* Active indicator */}
@@ -212,10 +135,10 @@ const JobCard = ({ job, isActive, onClick }) => (
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
-            <MapPin size={12} className="text-slate-300" /> {job.location_type}
+            <MapPin size={12} className="text-slate-300" /> {job.location || "Remote"}
           </span>
-          <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
-            <Briefcase size={12} className="text-slate-300" /> {job.experience_level}
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 capitalize">
+            <Briefcase size={12} className="text-slate-300" /> {(job.job_type || "Full-time").replace('_', ' ')}
           </span>
           <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
             <Clock size={12} className="text-slate-300" /> {new Date(job.created_at).toLocaleDateString()}
@@ -225,7 +148,7 @@ const JobCard = ({ job, isActive, onClick }) => (
     </div>
 
     <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-50">
-      {(job.tags || []).map(tag => (
+      {(job.tags && job.tags.length > 0 ? job.tags : ["AI", "Hiring", job.job_type || "Full-time"]).map(tag => (
         <span key={tag} className="px-2 py-0.5 rounded-lg bg-slate-50 text-slate-500 text-[9px] font-bold uppercase tracking-wider group-hover:bg-[#0f9e76]/5 group-hover:text-[#0f9e76] transition-colors">
           {tag}
         </span>
@@ -237,6 +160,9 @@ const JobCard = ({ job, isActive, onClick }) => (
 const JobDetail = ({ job, onChatOpen }) => {
   const { isLoggedIn, user } = useAuth();
   const router = useRouter();
+
+  // Smart Parser for Description
+  const parsedData = useMemo(() => parseJobDetails(job), [job]);
 
   const handleApply = async () => {
     if (!isLoggedIn) {
@@ -275,33 +201,39 @@ const JobDetail = ({ job, onChatOpen }) => {
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#0f9e76]/5 rounded-full blur-2xl" />
 
         <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex gap-4 items-center">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0d4f3c] to-[#0f9e76] text-white flex items-center justify-center font-black text-xl shadow-lg shadow-teal/10">
+          <div className="flex gap-4 items-center min-w-0 flex-1">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0d4f3c] to-[#0f9e76] text-white flex items-center justify-center font-black text-xl shadow-lg shadow-teal/10 shrink-0">
               {job.company_name?.[0]?.toUpperCase() || "J"}
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-black text-[#0d4f3c] tracking-tight">{job.title}</h1>
-                <span className="bg-[#0f9e76] text-white text-[8px] font-black px-2 py-0.5 rounded-full">LIVE</span>
+                <h1 className="text-2xl font-black text-[#0d4f3c] tracking-tight truncate py-1">{job.title}</h1>
+                <span className="bg-[#0f9e76] text-white text-[8px] font-black px-2 py-0.5 rounded-full shrink-0">LIVE</span>
               </div>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 font-bold text-[12px]">
-                <span className="flex items-center gap-1.5 text-[#0f9e76]"><Building2 size={13} /> {job.company_name}</span>
-                <span className="flex items-center gap-1.5"><MapPin size={13} /> {job.location}</span>
-                <span className="text-[#0d4f3c]">{job.salary_range}</span>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 font-bold text-[12px] truncate">
+                <span className="flex items-center gap-1.5 text-[#0f9e76] shrink-0"><Building2 size={13} /> {job.company_name}</span>
+                <span className="flex items-center gap-1.5 shrink-0"><MapPin size={13} /> {job.location}</span>
+                <span className="text-[#0d4f3c] shrink-0">{job.salary_range}</span>
               </div>
             </div>
           </div>
 
           <div className="flex gap-2 items-center">
             <button
-              onClick={onChatOpen}
+              onClick={() => {
+                if (!isLoggedIn) {
+                  router.push(`/auth?jobId=${job.id}`);
+                  return;
+                }
+                onChatOpen();
+              }}
               className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-teal-600 text-sm font-bold rounded-xl hover:border-teal-500 hover:bg-teal-50 transition-all shadow-sm group/chat shrink-0"
             >
               <Sparkles size={16} className="text-teal-500 group-hover/chat:scale-110 transition-transform" />
               <span className="hidden sm:inline">Chat with HireNP</span>
               <span className="sm:hidden">Chat</span>
             </button>
-            
+
             {isLoggedIn ? (
               <button
                 onClick={handleApply}
@@ -329,101 +261,103 @@ const JobDetail = ({ job, onChatOpen }) => {
               <div className="w-1 h-4 bg-[#0f9e76] rounded-full" />
               <h3 className="text-sm font-black text-[#0d4f3c] uppercase tracking-wider">Mission</h3>
             </div>
-            <p className="text-slate-600 leading-relaxed text-[15px] font-medium">{job.description}</p>
+            <p className="text-slate-600 leading-relaxed text-[15px] font-medium">{parsedData.mission}</p>
           </section>
 
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-4 bg-[#0d4f3c] rounded-full" />
-              <h3 className="text-sm font-black text-[#0d4f3c] uppercase tracking-wider">Core Competencies</h3>
-            </div>
-            <div className="space-y-3">
-              {(job.responsibilities || []).map((r, i) => (
-                <div key={i} className="flex gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors group">
-                  <div className="w-5 h-5 rounded-full bg-[#0f9e76]/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 size={12} className="text-[#0f9e76]" />
+          {parsedData.competencies.length > 0 && (
+            <section>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1 h-4 bg-[#0d4f3c] rounded-full" />
+                <h3 className="text-sm font-black text-[#0d4f3c] uppercase tracking-wider">Core Competencies</h3>
+              </div>
+              <div className="space-y-3">
+                {parsedData.competencies.map((r, i) => (
+                  <div key={i} className="flex gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors group">
+                    <div className="w-5 h-5 rounded-full bg-[#0f9e76]/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <CheckCircle2 size={12} className="text-[#0f9e76]" />
+                    </div>
+                    <p className="text-slate-600 text-[13px] font-semibold leading-relaxed">{r}</p>
                   </div>
-                  <p className="text-slate-600 text-[13px] font-semibold leading-relaxed">{r}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          )}
 
-          <section className="bg-[#0d4f3c]/5 rounded-[24px] p-6 relative overflow-hidden">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-4 bg-[#0d4f3c] rounded-full" />
-              <h3 className="text-sm font-black text-[#0d4f3c] uppercase tracking-wider">Requirements</h3>
-            </div>
-            <ul className="space-y-3">
-              {(job.requirements || []).map((r, i) => (
-                <li key={i} className="flex gap-4 items-start text-slate-700 text-[13px] font-semibold leading-relaxed">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#0f9e76] mt-1.5 shrink-0" />
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </section>
+          {parsedData.requirements.length > 0 && (
+            <section className="bg-[#0d4f3c]/5 rounded-[24px] p-6 relative overflow-hidden">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1 h-4 bg-[#0d4f3c] rounded-full" />
+                <h3 className="text-sm font-black text-[#0d4f3c] uppercase tracking-wider">Requirements</h3>
+              </div>
+              <ul className="space-y-3">
+                {parsedData.requirements.map((r, i) => (
+                  <li key={i} className="flex gap-4 items-start text-slate-700 text-[13px] font-semibold leading-relaxed">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#0f9e76] mt-1.5 shrink-0" />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
+
 export default function JobBoard() {
   const { isLoggedIn } = useAuth();
+  const { 
+    filteredJobs, 
+    loading, 
+    query, 
+    setQuery, 
+    filters, 
+    setFilters, 
+    selectedJobId, 
+    setSelectedJobId 
+  } = useJobs();
+  
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState("");
-  const [filters, setFilters] = useState({ type: "", location: "", experience: "" });
-  const [jobs, setJobs] = useState([]);
-  const [selectedId, setSelectedId] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
-
-  // Fetch jobs from Supabase
-  useEffect(() => {
-    const fetchJobs = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching jobs:', error);
-      } else {
-        setJobs(data || []);
-        if (data && data.length > 0 && !selectedId) {
-          setSelectedId(data[0].id);
-        }
-      }
-      setLoading(false);
-    };
-
-    fetchJobs();
-  }, []);
 
   // Sync selection with URL jobId param
   useEffect(() => {
     const jobId = searchParams.get("jobId");
-    if (jobId && jobs.length > 0) {
-      const id = jobId; 
-      if (jobs.some(j => j.id === id)) {
-        setSelectedId(id);
+    if (jobId && filteredJobs.length > 0) {
+      if (filteredJobs.some(j => j.id === jobId)) {
+        setSelectedJobId(jobId);
       }
     }
-  }, [searchParams, jobs]);
+  }, [searchParams, filteredJobs, setSelectedJobId]);
 
-  const filteredJobs = useMemo(() => jobs.filter(j =>
-    (j.title.toLowerCase().includes(query.toLowerCase()) || j.company_name?.toLowerCase().includes(query.toLowerCase())) &&
-    (!filters.type || j.job_type === filters.type) && (!filters.location || j.location_type === filters.location) &&
-    (!filters.experience || j.experience_level === filters.experience)
-  ), [query, filters, jobs]);
+  // Transform data for UI (salary range construction)
+  const jobsWithUIFields = useMemo(() => {
+    return filteredJobs.map(j => ({
+      ...j,
+      salary_range: j.salary_min && j.salary_max
+        ? `$${Math.round(j.salary_min / 1000)}k - $${Math.round(j.salary_max / 1000)}k`
+        : j.salary_max ? `$${Math.round(j.salary_max / 1000)}k` : "Salary Negotiable"
+    }));
+  }, [filteredJobs]);
 
-  const activeJob = filteredJobs.find(j => j.id === selectedId) || filteredJobs[0];
+  const activeJob = jobsWithUIFields.find(j => j.id === selectedJobId) || jobsWithUIFields[0];
+
+  // Enriched Job for the Chatbot
+  const chatJobContext = useMemo(() => {
+    if (!activeJob) return null;
+    const { requirements, competencies } = parseJobDetails(activeJob);
+    return {
+      ...activeJob,
+      skills: requirements,
+      responsibilities: competencies
+    };
+  }, [activeJob]);
 
   return (
     <div className="min-h-screen bg-slate-50/50">
-      <Navbar query={query} setQuery={setQuery} />
+      <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 md:px-10 pt-6">
         <AuthBanner isAuthenticated={isLoggedIn} />
@@ -449,7 +383,19 @@ export default function JobBoard() {
                   ))}
                 </div>
               ) : filteredJobs.length > 0 ? (
-                filteredJobs.map(j => <JobCard key={j.id} job={j} isActive={activeJob?.id === j.id} onClick={(job) => setSelectedId(job.id)} />)
+                filteredJobs.map(j => (
+                  <JobCard 
+                    key={j.id} 
+                    job={{
+                      ...j,
+                      salary_range: j.salary_min && j.salary_max
+                        ? `$${Math.round(j.salary_min / 1000)}k - $${Math.round(j.salary_max / 1000)}k`
+                        : j.salary_max ? `$${Math.round(j.salary_max / 1000)}k` : "Salary Negotiable"
+                    }} 
+                    isActive={activeJob?.id === j.id} 
+                    onClick={(job) => setSelectedJobId(job.id)} 
+                  />
+                ))
               ) : (
                 <div className="py-20 text-center bg-white rounded-3xl border border-dashed border-slate-200">
                   <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
@@ -477,10 +423,10 @@ export default function JobBoard() {
       </main>
 
       {/* Chat Assistant */}
-      <ChatPopup 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
-        job={activeJob}
+      <ChatPopup
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        job={chatJobContext}
       />
 
       {/* Mobile Search */}

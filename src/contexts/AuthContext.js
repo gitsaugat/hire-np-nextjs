@@ -76,9 +76,9 @@ export function AuthProvider({ children }) {
       let extraData = {};
 
       if (dbUser.role === 'candidate') {
-        // 2a. Fetch profile for candidates
+        // 2a. Fetch profile for candidates from normalized table
         const { data: profile } = await supabase
-          .from('profiles')
+          .from('candidate_profiles')
           .select('*')
           .eq('user_id', dbUser.id)
           .single();

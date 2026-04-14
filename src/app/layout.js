@@ -20,6 +20,8 @@ const notoDevanagari = Noto_Sans_Devanagari({
 
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { JobProvider } from "@/contexts/JobContext";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 
 export const metadata = {
   title: "HireNP — Nepal's First AI Hiring Platform",
@@ -34,9 +36,13 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col font-sans">
         <AuthProvider>
-          <LanguageProvider>
-            {children}
-          </LanguageProvider>
+          <ProfileProvider>
+            <JobProvider>
+              <LanguageProvider>
+                {children}
+              </LanguageProvider>
+            </JobProvider>
+          </ProfileProvider>
         </AuthProvider>
       </body>
     </html>

@@ -67,9 +67,12 @@ export default function DashboardPage() {
               id, 
               status, 
               created_at, 
-              profiles(full_name), 
+              users:user_id(
+                email,
+                profiles(full_name)
+              ),
               jobs(title),
-              application_ai_data(score)
+              application_ai_data(match_score)
             `)
             .in('job_id', jobIds)
             .order('created_at', { ascending: false });
@@ -79,7 +82,8 @@ export default function DashboardPage() {
           // 3. Process Stats
           const processedApps = apps.map(app => ({
             ...app,
-            ai_score: app.application_ai_data?.[0]?.score || 0
+            full_name: app.users?.profiles?.[0]?.full_name || app.users?.email || 'Unknown',
+            ai_score: app.application_ai_data?.[0]?.match_score || 0
           }));
 
           setApplicants(processedApps.slice(0, 10)); // Top 10 for "Recent" table

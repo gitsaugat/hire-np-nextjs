@@ -2,26 +2,42 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Send, 
-  X, 
-  Sparkles, 
-  User, 
-  Bot, 
-  MessageCircle, 
+
+import {
+  Send,
+  X,
+  Sparkles,
+  User,
+  Bot,
+  Mic,
+  MicOff,
+  MessageCircle,
   ChevronRight,
   Info
 } from "lucide-react";
 
 export default function ChatPopup({ isOpen, onClose, job }) {
-  const [messages, setMessages] = useState([
-    { 
-      id: 1, 
-      role: "assistant", 
-      content: `Hi there! I'm your AI assistant for HireNP. I've analyzed the ${job?.title} position at ${job?.company_name || 'this company'}. How can I help you today?` 
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+
+  // Reset chat when job changes
+  useEffect(() => {
+    setMessages([]);
+    setInput("");
+  }, [job?.id]);
+
+  // Sync initial message when job is loaded or chat is opened
+  useEffect(() => {
+    if (job?.title && messages.length === 0) {
+      setMessages([
+        {
+          id: 1,
+          role: "assistant",
+          content: `Hi there! I'm your AI assistant for HireNP. I've analyzed the **${job.title}** position at **${job.company_name || 'this company'}**. How can I help you today?`
+        }
+      ]);
+    }
+  }, [job, isOpen, messages.length]);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef(null);
 
@@ -31,39 +47,159 @@ export default function ChatPopup({ isOpen, onClose, job }) {
     }
   }, [messages, isTyping]);
 
+  const [isListening, setIsListening] = useState(false);
+  const baseInputRef = useRef("");
+
+  // Speech Recognition Setup
+  useEffect(() => {
+    let recognition = null;
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onresult = (event) => {
+          let sessionTranscript = "";
+          for (let i = 0; i < event.results.length; ++i) {
+            sessionTranscript += event.results[i][0].transcript;
+          }
+          setInput(baseInputRef.current + (baseInputRef.current ? " " : "") + sessionTranscript);
+        };
+
+        recognition.onend = () => setIsListening(false);
+        recognition.onerror = () => setIsListening(false);
+      }
+    }
+
+    if (isListening) {
+      baseInputRef.current = input;
+      if (recognition) recognition.start();
+    } else {
+      if (recognition) recognition.stop();
+    }
+
+    return () => { if (recognition) recognition.stop(); };
+  }, [isListening]);
+
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
+    
+    // Word limit check (200 words)
+    const wordCount = input.trim().split(/\s+/).length;
+    if (wordCount > 200) {
+      alert("Please limit your message to 200 words or less.");
+      return;
+    }
+
+    if (isListening) setIsListening(false);
 
     const userMessage = { id: Date.now(), role: "user", content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        "That's a great question! Based on the job description, this role focuses heavily on direct impact and technical growth.",
-        `For the ${job?.title} role, the team is looking for someone who can hit the ground running with their core tech stack.`,
-        "The company culture seems to prioritize collaboration and fast-paced innovation. Would you like to know more about the specific requirements?",
-        "I've checked the requirements: you'll need strong experience in the mentioned areas, but they also value 'soft skills' like leadership and communication."
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    try {
+      const systemPrompt = `You are an AI assistant for HireNP, a job platform. 
+      You are helping a candidate learn more about this specific job opening.
       
-      setMessages(prev => [...prev, { 
-        id: Date.now() + 1, 
-        role: "assistant", 
-        content: randomResponse 
+      JOB DETAILS:
+      - TITLE: ${job?.title}
+      - COMPANY: ${job?.company_name || 'HireNP Partner'}
+      - LOCATION: ${job?.location || 'Remote'}
+      - SALARY: ${job?.salary_range || 'Competitive / Negotiable'}
+      - TYPE: ${job?.job_type || 'Full-time'}
+      - EXPERIENCE LEVEL: ${job?.experience_level || 'Not specified'}
+      
+      REQUIRED SKILLS:
+      ${job?.skills?.length > 0 ? job.skills.map(s => `- ${s}`).join('\n') : '- General proficiency in the role'}
+      
+      KEY RESPONSIBILITIES:
+      ${job?.responsibilities?.length > 0 ? job.responsibilities.map(r => `- ${r}`).join('\n') : '- Mentioned in full description'}
+      
+      FULL DESCRIPTION:
+      ${job?.description}
+      
+      GUIDELINES:
+      - Answer based ONLY on the info above. 
+      - FORMATTING: Use Markdown strictly. Use **bold** for key terms and bulleted lists for several points.
+      - If info is missing (like specific travel or benefits), say you don't have that detail and suggest they discuss it during an interview.
+      - Keep it professional, encouraging, and helpful.`;
+
+      const response = await fetch("http://localhost:11434/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "gpt-oss:20b-cloud",
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...messages.map(m => ({ role: m.role, content: m.content })),
+            { role: "user", content: input }
+          ],
+          stream: false,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Could not connect to AI assistant.");
+
+      const data = await response.json();
+      const aiContent = data.message?.content || "I'm sorry, I'm having trouble processing that right now.";
+
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        role: "assistant",
+        content: aiContent
       }]);
+    } catch (err) {
+      console.error("Chat Error:", err);
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        role: "assistant",
+        content: "I'm currently offline. Please try again in a moment!"
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
+  };
+
+  const MarkdownText = ({ content }) => {
+    // Very simple bolding and list support
+    const lines = content.split('\n');
+    return (
+      <div className="space-y-1.5 whitespace-pre-wrap">
+        {lines.map((line, i) => {
+          let processed = line;
+          // Handle bold
+          const boldMatch = line.match(/\*\*(.*?)\*\*/g);
+          if (boldMatch) {
+            return (
+              <p key={i} className="leading-relaxed">
+                {line.split(/\*\*(.*?)\*\*/).map((part, j) => 
+                  j % 2 === 1 ? <strong key={j} className="text-[#0d4f3c] font-black">{part}</strong> : part
+                )}
+              </p>
+            );
+          }
+          // Handle bullets
+          if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+            return <div key={i} className="pl-4 relative flex items-start gap-2">
+              <div className="w-1 h-1 rounded-full bg-[#0d4f3c] mt-2 shrink-0" />
+              <span>{line.trim().substring(2)}</span>
+            </div>;
+          }
+          return <p key={i} className="leading-relaxed">{line}</p>;
+        })}
+      </div>
+    );
   };
 
   const starterQuestions = [
-    "What are the key responsibilities?",
-    "Tell me about the culture.",
-    "What tech stack is used?",
-    "Is this role remote?"
+    "What are the core skills needed?",
+    "Tell me about the salary and location.",
+    "What will be my daily responsibilities?",
+    "Is this an office-based or remote role?"
   ];
 
   return (
@@ -90,7 +226,7 @@ export default function ChatPopup({ isOpen, onClose, job }) {
                     <p className="text-[10px] text-teal-200/80 font-medium">Powered by AI Assistant</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={onClose}
                   className="p-2 hover:bg-white/10 rounded-xl transition-colors"
                 >
@@ -100,7 +236,7 @@ export default function ChatPopup({ isOpen, onClose, job }) {
             </div>
 
             {/* Chat Area */}
-            <div 
+            <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-slate-50/30"
             >
@@ -118,17 +254,15 @@ export default function ChatPopup({ isOpen, onClose, job }) {
                   key={msg.id}
                   className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                 >
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                    msg.role === "assistant" ? "bg-[#0d4f3c] text-white" : "bg-white border border-slate-200 text-slate-400"
-                  }`}>
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${msg.role === "assistant" ? "bg-[#0d4f3c] text-white" : "bg-white border border-slate-200 text-slate-400"
+                    }`}>
                     {msg.role === "assistant" ? <Bot size={16} /> : <User size={16} />}
                   </div>
-                  <div className={`max-w-[80%] p-4 rounded-2xl text-[13px] font-semibold leading-relaxed ${
-                    msg.role === "assistant" 
-                      ? "bg-white border border-slate-100 text-slate-700 shadow-sm rounded-tl-none" 
+                  <div className={`max-w-[80%] p-4 rounded-2xl text-[13px] font-semibold leading-relaxed ${msg.role === "assistant"
+                      ? "bg-white border border-slate-100 text-slate-700 shadow-sm rounded-tl-none"
                       : "bg-[#0d4f3c] text-white shadow-md shadow-teal/5 rounded-tr-none"
-                  }`}>
-                    {msg.content}
+                    }`}>
+                    <MarkdownText content={msg.content} />
                   </div>
                 </motion.div>
               ))}
@@ -163,22 +297,39 @@ export default function ChatPopup({ isOpen, onClose, job }) {
                 </div>
               )}
 
-              <form onSubmit={handleSend} className="relative group">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about this role..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-5 pr-14 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-teal-500/5 focus:bg-white focus:border-teal-500/50 transition-all"
-                />
+              <form onSubmit={handleSend} className="relative flex flex-col gap-2">
+                <div className="flex justify-end px-2">
+                  <span className={`text-[10px] font-bold ${input.trim().split(/\s+/).length > 200 ? "text-red-500" : "text-slate-400"}`}>
+                    {input.trim() ? input.trim().split(/\s+/).length : 0} / 200 words
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 group">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Ask about this role..."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-5 pr-12 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-teal-500/5 focus:bg-white focus:border-teal-500/50 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsListening(!isListening)}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all ${isListening ? "bg-red-500 text-white animate-pulse" : "text-slate-400 hover:text-teal-600 hover:bg-teal-50"
+                      }`}
+                  >
+                    {isListening ? <X size={18} /> : <Mic size={18} />}
+                  </button>
+                </div>
                 <button
                   type="submit"
-                  disabled={!input.trim() || isTyping}
-                  className="absolute right-2 top-2 bottom-2 w-10 bg-[#0d4f3c] text-white rounded-xl flex items-center justify-center hover:bg-[#0f9e76] transition-all disabled:opacity-50 disabled:scale-95 active:scale-90 shadow-lg shadow-teal/10"
+                  disabled={!input.trim() || isTyping || input.trim().split(/\s+/).length > 200}
+                  className="w-12 h-12 bg-[#0d4f3c] text-white rounded-2xl flex items-center justify-center hover:bg-[#0f9e76] transition-all disabled:opacity-50 disabled:scale-95 active:scale-90 shadow-lg shadow-teal/10 shrink-0"
                 >
                   <Send size={18} />
                 </button>
-              </form>
+              </div>
+            </form>
             </div>
           </motion.div>
         </div>
