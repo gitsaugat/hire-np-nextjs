@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   validate,
@@ -69,26 +70,99 @@ export default function AuthPage() {
     [submitted]
   );
 
-  const handleSubmit = (e) => {
+  const [isPending, setIsPending] = useState(false);
+  const [authError, setAuthError] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setAuthError(null);
     const errs = validate(fields, values);
     setErrors(errs);
     setSubmitted(true);
+
     if (Object.keys(errs).length === 0) {
-      // Simulated login success
-      login({ 
-        name: values.fullName || (role === "candidate" ? "Candidate User" : "Company Admin"), 
-        email: values.email, 
-        role 
-      });
-      
-      const jobId = searchParams.get("jobId");
-      if (role === "company") {
-        router.push("/dashboard");
-      } else if (jobId) {
-        router.push(`/?jobId=${jobId}`);
-      } else {
-        router.push("/");
+      setIsPending(true);
+      try {
+        if (mode === "signup") {
+          // 1. Sign up user with metadata for the DB trigger
+          const dbRole = role === "company" ? "company_admin" : "candidate";
+
+          const { data: authData, error: authErr } = await supabase.auth.signUp({
+            email: values.email,
+            password: values.password,
+            options: {
+              data: {
+                role: dbRole,
+                full_name: values.fullName || values.name
+              }
+            }
+          });
+
+          if (authErr) throw authErr;
+          if (!authData.user) throw new Error("User creation failed");
+
+          const userId = authData.user.id;
+
+          if (role === "candidate") {
+            // 2a. Create candidate profile
+            const { error: profileErr } = await supabase
+              .from('profiles')
+              .insert([
+                {
+                  user_id: userId,
+                  full_name: values.fullName,
+                }
+              ]);
+
+            if (profileErr) throw profileErr;
+          } else {
+            // 2b. Create company and link member
+            // First, create the company
+            const { data: companyData, error: companyErr } = await supabase
+              .from('companies')
+              .insert([
+                {
+                  name: values.companyName,
+                }
+              ])
+              .select()
+              .single();
+
+            if (companyErr) throw companyErr;
+
+            // Then, link the user as a company member (admin)
+            const { error: memberErr } = await supabase
+              .from('company_members')
+              .insert([
+                {
+                  company_id: companyData.id,
+                  user_id: userId,
+                  role: 'admin'
+                }
+              ]);
+
+            if (memberErr) throw memberErr;
+          }
+        } else {
+          // Sign in mode
+          await login(values.email, values.password);
+        }
+
+
+        // 3. Post-auth redirection
+        const jobId = searchParams.get("jobId");
+        if (role === "company") {
+          router.push("/dashboard");
+        } else if (jobId) {
+          router.push(`/?jobId=${jobId}`);
+        } else {
+          router.push("/");
+        }
+      } catch (err) {
+        setAuthError(err.message || "An authentication error occurred");
+        console.error('Auth error:', err);
+      } finally {
+        setIsPending(false);
       }
     }
   };
@@ -167,18 +241,36 @@ export default function AuthPage() {
               </div>
             )}
 
+            {authError && (
+              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {authError}
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full h-12 rounded-xl text-white text-base font-bold cursor-pointer transition-all duration-300 mt-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]"
+              disabled={isPending}
+              className={`w-full h-12 rounded-xl text-white text-base font-bold cursor-pointer transition-all duration-300 mt-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] flex items-center justify-center gap-2 ${isPending ? 'opacity-70 cursor-not-allowed' : ''}`}
               style={{
                 background: "linear-gradient(135deg, #0d4f3c, #0f9e76)",
                 boxShadow: "0 4px 14px rgba(13,79,60,0.25)",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 6px 24px rgba(13,79,60,0.35)")}
-              onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 14px rgba(13,79,60,0.25)")}
+              onMouseEnter={(e) => !isPending && (e.currentTarget.style.boxShadow = "0 6px 24px rgba(13,79,60,0.35)")}
+              onMouseLeave={(e) => !isPending && (e.currentTarget.style.boxShadow = "0 4px 14px rgba(13,79,60,0.25)")}
               id="auth-submit"
             >
-              {ctaLabel}
+              {isPending ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : ctaLabel}
             </button>
 
             <p className="text-center text-sm text-text-muted pt-1">

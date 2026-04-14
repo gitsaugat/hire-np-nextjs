@@ -1,30 +1,123 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 import {
   Users,
   Briefcase,
   Zap,
   TrendingUp,
   ArrowUpRight,
-  MoreVertical
+  MoreVertical,
+  Plus
 } from "lucide-react";
 
-const stats = [
-  { name: "Active Jobs", value: "12", icon: Briefcase, trend: "+2 this month", color: "text-blue-600", bg: "bg-blue-50" },
-  { name: "Total Applicants", value: "486", icon: Users, trend: "+12% vs last month", color: "text-teal", bg: "bg-teal/10" },
-  { name: "AI Shortlisted", value: "84", icon: Zap, trend: "17% conversion", color: "text-amber-600", bg: "bg-amber-50" },
-  { name: "Hiring Rate", value: "24%", icon: TrendingUp, trend: "+4% improvement", color: "text-purple-600", bg: "bg-purple-50" },
-];
-
-const recentApplicants = [
-  { name: "Suman Shrestha", role: "Senior Frontend Engineer", score: 94, status: "Shortlisted", date: "2h ago" },
-  { name: "Anjali Rayamajhi", role: "Product Designer", score: 88, status: "Interviewing", date: "5h ago" },
-  { name: "Biraj Thapa", role: "Backend Developer", score: 82, status: "Applied", date: "8h ago" },
-  { name: "Nikita Sharma", role: "Mobile Lead", score: 91, status: "Shortlisted", date: "1d ago" },
-];
+// Types for stats
+// const stats = ... moved inside component for dynamic values
 
 export default function DashboardPage() {
+  const { user, isLoggedIn, isLoading } = useAuth();
+  const router = useRouter();
+  const [jobs, setJobs] = useState([]);
+  const [applicants, setApplicants] = useState([]);
+  const [statsData, setStatsData] = useState({
+    activeJobs: 0,
+    totalApplicants: 0,
+    aiShortlisted: 0,
+    shortlisted: 0,
+    interview: 0,
+    offered: 0
+  });
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      router.push("/auth");
+    } else if (user && user.role !== 'company_admin' && user.role !== 'company') {
+      router.push("/");
+    }
+  }, [user, isLoggedIn, isLoading, router]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      // Use company_id from AuthContext now that we fixed it
+      const companyId = user?.company_id;
+      if (!companyId) return;
+
+      setIsDataLoading(true);
+      try {
+        // 1. Fetch total jobs
+        const { data: companyJobs, error: jobsError } = await supabase
+          .from('jobs')
+          .select('id, title, is_active')
+          .eq('company_id', companyId);
+
+        if (jobsError) throw jobsError;
+        setJobs(companyJobs || []);
+
+        const jobIds = companyJobs.map(j => j.id);
+        
+        if (jobIds.length > 0) {
+          // 2. Fetch applications with AI scores
+          const { data: apps, error: appsError } = await supabase
+            .from('applications')
+            .select(`
+              id, 
+              status, 
+              created_at, 
+              profiles(full_name), 
+              jobs(title),
+              application_ai_data(score)
+            `)
+            .in('job_id', jobIds)
+            .order('created_at', { ascending: false });
+
+          if (appsError) throw appsError;
+
+          // 3. Process Stats
+          const processedApps = apps.map(app => ({
+            ...app,
+            ai_score: app.application_ai_data?.[0]?.score || 0
+          }));
+
+          setApplicants(processedApps.slice(0, 10)); // Top 10 for "Recent" table
+
+          setStatsData({
+            activeJobs: companyJobs.filter(j => j.is_active).length,
+            totalApplicants: processedApps.length,
+            aiShortlisted: processedApps.filter(a => a.ai_score >= 80).length,
+            shortlisted: processedApps.filter(a => a.status === 'shortlisted').length,
+            interview: processedApps.filter(a => a.status === 'interview').length,
+            offered: processedApps.filter(a => a.status === 'offered').length
+          });
+        }
+      } catch (err) {
+        console.error('Dashboard data fetch error:', err);
+      } finally {
+        setIsDataLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [user]);
+
+  const stats = [
+    { name: "Active Jobs", value: statsData.activeJobs.toString(), icon: Briefcase, trend: "Live postings", color: "text-blue-600", bg: "bg-blue-50" },
+    { name: "Total Applicants", value: statsData.totalApplicants.toString(), icon: Users, trend: "Across current roles", color: "text-teal", bg: "bg-teal/10" },
+    { name: "Hiring Pipeline", value: `${statsData.shortlisted + statsData.interview + statsData.offered}`, icon: Zap, trend: "Active leads", color: "text-amber-600", bg: "bg-amber-50" },
+    { name: "Top Matches", value: statsData.aiShortlisted.toString(), icon: TrendingUp, trend: "AI Score > 80%", color: "text-purple-600", bg: "bg-purple-50" },
+  ];
+
+
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal"></div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-8">
       {/* Header Section */}
@@ -75,31 +168,37 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f1f5f9]">
-                {recentApplicants.map((app) => (
-                  <tr key={app.name} className="hover:bg-[#f8fafc] transition-colors group">
+                {applicants.length > 0 ? applicants.map((app) => (
+                  <tr key={app.id} className="hover:bg-[#f8fafc] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-forest/5 rounded-full flex items-center justify-center font-bold text-forest text-xs">
-                          {app.name.split(' ').map(n => n[0]).join('')}
+                          {app.profiles?.full_name?.split(' ').map(n => n[0]).join('') || "?"}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-forest">{app.name}</p>
-                          <p className="text-[10px] text-text-muted">{app.date}</p>
+                          <p className="text-sm font-bold text-forest">{app.profiles?.full_name || "Anonymous"}</p>
+                          <p className="text-[10px] text-text-muted">{new Date(app.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-text-muted">{app.role}</td>
+                    <td className="px-6 py-4 text-sm text-text-muted">{app.jobs?.title}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`px-2 py-1 rounded-lg text-xs font-bold ${app.score >= 90 ? "bg-teal/10 text-teal" : "bg-amber-50 text-amber-600"
+                      <span className={`px-2 py-1 rounded-lg text-xs font-bold ${app.ai_score >= 80 ? "bg-teal/10 text-teal" : "bg-amber-50 text-amber-600"
                         }`}>
-                        {app.score}%
+                        {app.ai_score || 0}%
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-xs font-bold text-teal">{app.status}</span>
+                      <span className="text-xs font-bold text-teal capitalize">{app.status}</span>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan="4" className="px-6 py-10 text-center text-text-muted font-medium">
+                      No applicants yet. Keep it up!
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
