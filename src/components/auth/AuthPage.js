@@ -195,18 +195,34 @@ export default function AuthPage() {
   const formKey = `${role}-${mode}`;
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-white pt-24 pb-8 px-4 overflow-hidden">
-      <Navbar showSearch={false} />
-      <div className="absolute inset-0 mesh-overlay opacity-20 pointer-events-none" />
+    <div className="relative min-h-screen bg-white overflow-hidden">
+      {/* 1. Detached Navbar */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <Navbar showSearch={false} />
+      </div>
 
-      {/* Atmospheric Watermark Blobs */}
-      <div className="absolute top-20 left-[-10%] w-96 h-96 bg-teal/5 blur-[120px] rounded-full animate-float" />
-      <div className="absolute bottom-20 right-[-5%] w-72 h-72 bg-forest/5 blur-[100px] rounded-full animate-float" />
+      {/* 2. Enhanced Atmospheric Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 mesh-overlay opacity-30" />
+        
+        {/* Dynamic Orbs */}
+        <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-teal/5 blur-[120px] rounded-full animate-float" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-forest/5 blur-[100px] rounded-full animate-float" style={{ animationDuration: '12s' }} />
+        <div className="absolute top-[20%] right-[10%] w-[300px] h-[300px] bg-aqua/5 blur-[80px] rounded-full animate-float" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(#0d4f3c 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+      </div>
 
-      <div
-        className={`relative z-10 w-full bg-white rounded-[32px] px-8 py-10 max-[520px]:max-w-full max-[520px]:rounded-none max-[520px]:min-h-screen max-[520px]:px-5 max-[520px]:py-8 max-[520px]:flex max-[520px]:flex-col max-[520px]:justify-center transition-all duration-300 ${mode === "signup" ? "max-w-[640px]" : "max-w-[480px]"}`}
-        style={{ boxShadow: "0 30px 60px -12px rgba(13,79,60,0.12), 0 18px 36px -18px rgba(13,79,60,0.15)" }}
-      >
+      {/* 3. Centered Content Wrapper */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center pt-20 pb-12 px-4 shadow-sm">
+        <div
+          className={`w-full bg-white/80 backdrop-blur-xl rounded-[40px] px-10 py-12 max-[520px]:max-w-full max-[520px]:rounded-none max-[520px]:min-h-screen max-[520px]:px-6 max-[520px]:py-10 max-[520px]:flex max-[520px]:flex-col max-[520px]:justify-center transition-all duration-500 ease-out ${mode === "signup" ? "max-w-[680px]" : "max-w-[480px]"}`}
+          style={{ 
+            boxShadow: "0 40px 100px -20px rgba(13,79,60,0.15), 0 24px 48px -24px rgba(13,79,60,0.2), 0 0 1px 0 rgba(13,79,60,0.1)",
+            border: "1px solid rgba(15,158,118,0.08)"
+          }}
+        >
 
         <RoleToggle role={role} setRole={switchRole} />
 
@@ -318,6 +334,7 @@ export default function AuthPage() {
             </p>
           </motion.form>
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );
