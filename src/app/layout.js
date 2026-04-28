@@ -1,27 +1,7 @@
-import { Inter, Mukta, Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const mukta = Mukta({
-  variable: "--font-mukta",
-  subsets: ["devanagari", "latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
-
-const notoDevanagari = Noto_Sans_Devanagari({
-  variable: "--font-noto-devanagari",
-  subsets: ["devanagari", "latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
 import { LanguageProvider } from "@/i18n/LanguageContext";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { JobProvider } from "@/contexts/JobContext";
-import { ProfileProvider } from "@/contexts/ProfileContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export const metadata = {
   title: "HireNP — Nepal's First AI Hiring Platform",
@@ -30,20 +10,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${mukta.variable} ${notoDevanagari.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col font-sans">
-        <AuthProvider>
-          <ProfileProvider>
-            <JobProvider>
-              <LanguageProvider>
-                {children}
-              </LanguageProvider>
-            </JobProvider>
-          </ProfileProvider>
-        </AuthProvider>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
+        <ThemeProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

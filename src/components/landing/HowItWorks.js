@@ -1,36 +1,49 @@
-"use client";
-
-import React from 'react';
-import { Send, Brain, CheckCircle2 } from 'lucide-react';
-import { useLanguage } from '@/i18n/LanguageContext';
+import React from "react";
 
 export default function HowItWorks() {
-  const { t } = useLanguage();
-
-  const steps = [
-    { num: "01", titleKey: "howItWorks.step1.title", descKey: "howItWorks.step1.desc", icon: Send },
-    { num: "02", titleKey: "howItWorks.step2.title", descKey: "howItWorks.step2.desc", icon: Brain },
-    { num: "03", titleKey: "howItWorks.step3.title", descKey: "howItWorks.step3.desc", icon: CheckCircle2 },
-  ];
-
   return (
-    <section id="how-it-works" className="py-24 px-6 bg-aqua-white">
-      <div className="max-w-5xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-forest mb-4">{t('howItWorks.title')}</h2>
-        <p className="text-text-muted mb-16">{t('howItWorks.subtitle')}</p>
+    <section id="how-it-works" className="py-32 px-6 lg:px-8 bg-transparent">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 text-center mb-20 tracking-tight">
+          HireNP does the work.<br/>You make the call.
+        </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-          <div className="hidden md:block absolute top-16 left-[17%] right-[17%] h-0.5 hero-gradient" />
-          {steps.map((step, i) => (
-            <div key={i} className="relative flex flex-col items-center text-center space-y-6">
-              <div className="w-32 h-32 rounded-full hero-gradient flex items-center justify-center text-white shadow-lg z-10">
-                <step.icon className="w-12 h-12" />
-              </div>
-              <div className="text-sm font-bold text-teal tracking-widest">{step.num}</div>
-              <h3 className="text-xl font-bold text-forest">{t(step.titleKey)}</h3>
-              <p className="text-text-muted leading-relaxed">{t(step.descKey)}</p>
-            </div>
-          ))}
+        <div className="relative grid md:grid-cols-3 gap-16 md:gap-8">
+          {/* Connecting line - hidden on mobile */}
+          <div className="hidden md:block absolute top-6 left-0 w-full h-px bg-slate-200"></div>
+
+          {/* Step 1 */}
+          <div className="relative pt-2 md:pt-0">
+            <span className="inline-block text-lg font-bold text-[#22c55e] pr-4 mb-4 relative z-10">Step 1</span>
+            <h3 className="text-2xl font-bold text-slate-900 mb-4 leading-snug">
+              AI screens every applicant instantly
+            </h3>
+            <p className="text-slate-500 font-medium text-lg leading-relaxed">
+              No resume pile. AI scores, ranks, and rejects — with reasoning you can see.
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div className="relative pt-2 md:pt-0">
+            <span className="inline-block text-lg font-bold text-[#22c55e] pr-4 mb-4 relative z-10">Step 2</span>
+            <h3 className="text-2xl font-bold text-slate-900 mb-4 leading-snug">
+              You review the top 10 with full reasoning
+            </h3>
+            <p className="text-slate-500 font-medium text-lg leading-relaxed">
+              See exactly why each candidate was shortlisted. Reject or invite in seconds.
+            </p>
+          </div>
+
+          {/* Step 3 */}
+          <div className="relative pt-2 md:pt-0">
+            <span className="inline-block text-lg font-bold text-[#22c55e] pr-4 mb-4 relative z-10">Step 3</span>
+            <h3 className="text-2xl font-bold text-slate-900 mb-4 leading-snug">
+              HR only shows up for the interview
+            </h3>
+            <p className="text-slate-500 font-medium text-lg leading-relaxed">
+              One click to send the invite. Candidate schedules themselves.
+            </p>
+          </div>
         </div>
       </div>
     </section>
