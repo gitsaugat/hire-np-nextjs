@@ -20,8 +20,8 @@ export default function Footer() {
           <Link href="#product" className="text-sm font-bold text-slate-600 hover:text-slate-900">Product</Link>
           <Link href="#company" className="text-sm font-bold text-slate-600 hover:text-slate-900">Company</Link>
           <Link href="#blog" className="text-sm font-bold text-slate-600 hover:text-slate-900">Blog</Link>
-          <Link href="#privacy" className="text-sm font-bold text-slate-600 hover:text-slate-900">Privacy</Link>
-          <Link href="#terms" className="text-sm font-bold text-slate-600 hover:text-slate-900">Terms</Link>
+          <Link href="/privacy" className="text-sm font-bold text-slate-600 hover:text-slate-900">Privacy</Link>
+          <Link href="/terms" className="text-sm font-bold text-slate-600 hover:text-slate-900">Terms</Link>
         </nav>
 
         <div className="flex items-center gap-4">
