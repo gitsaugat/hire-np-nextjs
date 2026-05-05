@@ -1,114 +1,70 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* Branding Colors */
-  --color-forest: #0d4f3c;
-  --color-teal: #0f9e76;
-  --color-aqua: #2dd4b0;
-  --color-aqua-white: #f8fffe;
-  --color-amber: #f59e0b;
-
-  /* Generic Tokens */
-  --color-primary: #0f9e76;
-  --color-primary-dark: #0d4f3c;
-
-  --color-background: #ffffff;
-  --color-background-soft: #f8fffe;
-
-  --color-text: #0d4f3c;
-  --color-text-muted: #4b635c;
-
-  --color-border-primary: #0f9e76;
+  --color-brand-primary: #00B67A;
+  --color-brand-dark: #008F5E;
+  --color-brand-bg-dark: #0A0F1E;
+  --color-brand-card-dark: #111827;
+  --color-brand-border-dark: #1F2937;
+  --color-brand-text-primary: #FFFFFF;
+  --color-brand-text-secondary: #9CA3AF;
+  --color-brand-text-muted: #6B7280;
+  --color-brand-bg-light: #F9FAFB;
+  --color-brand-card-light: #FFFFFF;
+  --color-brand-border-light: #E5E7EB;
 
   /* Fonts */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-nepali: "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
-  
-  /* Formats */
-  --radius-2xl: 1rem;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "DM Serif Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #0d4f3c;
-  --font-inter: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mukta: "Mukta", ui-sans-serif, system-ui, sans-serif;
-  --font-noto-devanagari: "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+  --background: #FFFFFF;
+  --foreground: #0A0F1E;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: inherit;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Gradients */
-.hero-gradient {
-  background: linear-gradient(135deg, #0d4f3c, #0f9e76, #2dd4b0);
+/* Section entrance */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, #0d4f3c, #0f9e76);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s ease-out forwards;
 }
 
-/* Mesh Overlay Pattern */
-.mesh-overlay {
-  background-image: radial-gradient(at 0% 0%, rgba(45, 212, 176, 0.08) 0, transparent 50%),
-    radial-gradient(at 50% 0%, rgba(15, 158, 118, 0.05) 0, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(13, 79, 60, 0.08) 0, transparent 50%);
-}
-
-.mesh-overlay-dark {
-  background-image: radial-gradient(at 0% 0%, rgba(45, 212, 176, 0.1) 0, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(13, 79, 60, 0.2) 0, transparent 50%);
-}
-
-/* Animations */
+/* Mockup float */
 @keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 3s ease-in-out infinite;
 }
 
-/* Find Jobs button — attention magnet */
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(45, 212, 176, 0.3), 0 0 0 0 rgba(45, 212, 176, 0); }
-  50% { box-shadow: 0 0 16px rgba(45, 212, 176, 0.5), 0 0 24px rgba(45, 212, 176, 0.15); }
+/* Custom Utilities */
+.text-balance {
+  text-wrap: balance;
 }
 
-.btn-find-jobs {
-  position: relative;
-  overflow: hidden;
-  animation: glow-pulse 2.5s ease-in-out infinite;
-  background: linear-gradient(90deg, #2dd4b0 0%, #5eecd5 40%, #ffffff 50%, #5eecd5 60%, #2dd4b0 100%);
-  background-size: 200% 100%;
-  animation: glow-pulse 2.5s ease-in-out infinite, shimmer 3s ease-in-out infinite;
-}
-
-.btn-find-jobs:hover {
-  animation: none;
-  background: #0f9e76;
-  box-shadow: 0 0 24px rgba(45, 212, 176, 0.5);
-  transform: scale(1.05);
+.text-gradient {
+  background: linear-gradient(135deg, #00B67A, #008F5E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

@@ -1,22 +1,37 @@
 import "./globals.css";
+import { DM_Sans, DM_Serif_Display } from 'next/font/google';
 
-import { LanguageProvider } from "@/i18n/LanguageContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+});
+
+const dmSerif = DM_Serif_Display({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-dm-serif',
+  display: 'swap',
+});
 
 export const metadata = {
-  title: "HireNP — Nepal's First AI Hiring Platform",
-  description: "HireNP automates shortlisting, scheduling, and communication so your HR team focuses on people, not paperwork.",
+  title: "HireNP — AI-Native Hiring Intelligence Platform",
+  description: "Replace your entire hiring stack with one AI platform that explains every candidate decision. 15-day free trial. No card required.",
+  openGraph: {
+    title: "HireNP — AI-Native Hiring Intelligence Platform",
+    description: "Replace your entire hiring stack with one AI platform that explains every candidate decision. 15-day free trial. No card required.",
+    url: 'https://hire-np.com',
+    siteName: 'HireNP',
+    locale: 'en_US',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+    <html lang="en" className={`${dmSans.variable} ${dmSerif.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
-        <ThemeProvider>
-          <LanguageProvider>
-            {children}
-          </LanguageProvider>
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );
