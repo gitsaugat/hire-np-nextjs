@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Mail, MapPin, Clock, CheckCircle, Linkedin, Twitter } from 'lucide-react';
+import { Mail, MapPin, Clock, CheckCircle, Link, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const fade = {
@@ -197,10 +197,10 @@ export default function Contact() {
                 <h4 className={labelClass}>Social</h4>
                 <div className="flex items-center gap-2">
                   <a href="#" aria-label="LinkedIn" className="w-9 h-9 rounded-lg bg-[#FAFAF7] border border-black/[0.06] flex items-center justify-center text-ink-700 hover:bg-white hover:border-brand-primary/30 hover:text-brand-primary transition-all">
-                    <Linkedin size={15} />
+                    <Link size={15} />
                   </a>
                   <a href="#" aria-label="Twitter" className="w-9 h-9 rounded-lg bg-[#FAFAF7] border border-black/[0.06] flex items-center justify-center text-ink-700 hover:bg-white hover:border-brand-primary/30 hover:text-brand-primary transition-all">
-                    <Twitter size={15} />
+                    <X size={15} />
                   </a>
                 </div>
               </div>
