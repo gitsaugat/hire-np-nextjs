@@ -69,70 +69,78 @@ export default async function BlogPost({ params }) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-white">
       <Navbar />
-      <main className="flex-grow pt-32 pb-20">
-        <article className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-16">
+      <main className="flex-grow pt-28 pb-16">
+        <article className="max-w-6xl mx-auto px-5 lg:px-6">
+          <div className="flex flex-col lg:flex-row gap-12">
             {/* ARTICLE CONTENT */}
-            <div className="lg:w-[70%]">
-              <span className="inline-block px-3 py-1 rounded-full bg-[#00B67A]/10 text-[#00B67A] text-[10px] font-bold uppercase tracking-widest mb-6">
+            <div className="lg:w-[68%]">
+              <Link href="/blog" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink-500 hover:text-ink-900 mb-6 transition-colors">
+                ← Back to blog
+              </Link>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-brand-primary text-[9px] font-bold uppercase tracking-[0.14em] mb-4">
                 {post.category}
               </span>
-              <h1 className="text-4xl md:text-5xl font-serif text-[#0A0F1E] leading-tight mb-6">
+              <h1 className="text-3xl md:text-4xl font-serif text-ink-900 leading-[1.1] tracking-[-0.02em] mb-5 text-balance">
                 {post.title}
               </h1>
-              <p className="text-xl text-[#6B7280] font-medium leading-relaxed mb-8">
+              <p className="text-[16px] text-ink-500 leading-relaxed mb-7">
                 {post.excerpt}
               </p>
-              <div className="flex items-center gap-6 text-sm font-bold text-[#9CA3AF] mb-12">
+              <div className="flex items-center gap-3 text-[12px] font-medium text-ink-400 mb-8">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#F9FAFB] flex items-center justify-center border border-[#E5E7EB] text-[#00B67A]">
+                  <div className="w-6 h-6 rounded-full bg-brand-primary flex items-center justify-center font-bold text-white text-[11px]">
                     H
                   </div>
-                  <span>HireNP Team</span>
+                  <span className="text-ink-900 font-semibold text-[13px]">HireNP Team</span>
                 </div>
+                <span className="w-1 h-1 rounded-full bg-ink-200" />
                 <span>{post.readTime} read</span>
+                <span className="w-1 h-1 rounded-full bg-ink-200" />
                 <span>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
               </div>
-              
-              <div className="h-px bg-[#E5E7EB] w-full mb-12"></div>
-              
-              <div className="prose prose-lg prose-emerald max-w-none prose-headings:font-serif prose-headings:text-[#0A0F1E] prose-p:text-[#4B5563] prose-p:font-medium prose-p:leading-relaxed prose-strong:text-[#0A0F1E] prose-li:text-[#4B5563] prose-li:font-medium">
+
+              <div className="h-px bg-black/[0.06] w-full mb-8"></div>
+
+              <div className="prose prose-base max-w-none prose-headings:font-serif prose-headings:tracking-tight prose-headings:text-ink-900 prose-p:text-ink-700 prose-p:leading-relaxed prose-strong:text-ink-900 prose-li:text-ink-700 prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline">
                 <MDXRemote source={post.content} components={components} />
               </div>
             </div>
 
             {/* SIDEBAR */}
-            <div className="lg:w-[30%]">
-              <div className="sticky top-32 space-y-12">
+            <div className="lg:w-[32%]">
+              <div className="sticky top-24 space-y-7">
                 {/* CTA CARD */}
-                <div className="bg-[#00B67A] rounded-3xl p-8 text-white shadow-xl shadow-[#00B67A]/20">
-                  <h3 className="text-2xl font-serif mb-4 text-white">Try HireNP free for 15 days</h3>
-                  <p className="text-white/80 font-medium mb-8 leading-relaxed">
-                    Stop wasting weeks on candidates who were never going to make it. Start your free trial today.
+                <div className="card p-6 bg-[#FAFAF7]">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.16em] uppercase text-brand-primary mb-3">
+                    <span className="w-3 h-px bg-brand-primary/50" /> Free trial
+                  </span>
+                  <h3 className="text-lg font-serif text-ink-900 mb-2 leading-tight tracking-tight">Try HireNP free for 15 days</h3>
+                  <p className="text-ink-500 mb-4 leading-relaxed text-[13px]">
+                    Stop wasting weeks on candidates who were never going to make it.
                   </p>
-                  <Link 
+                  <Link
                     href="https://app.hire-np.com/auth/login"
-                    className="block w-full bg-[#0A0F1E] text-white py-4 rounded-full font-bold text-center hover:bg-black transition-all shadow-lg"
+                    className="btn-primary w-full"
                   >
-                    Start Free Trial
+                    Start free trial
                   </Link>
-                  <p className="text-center text-[10px] font-bold mt-4 text-white/60">
-                    NO CREDIT CARD REQUIRED
+                  <p className="text-center text-[10px] font-medium mt-2 text-ink-400 uppercase tracking-[0.14em]">
+                    No credit card required
                   </p>
                 </div>
 
                 {/* TABLE OF CONTENTS */}
                 {toc.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest mb-6">Table of Contents</h4>
-                    <ul className="space-y-4">
+                    <h4 className="text-[10px] font-semibold text-ink-400 uppercase tracking-[0.16em] mb-3">On this page</h4>
+                    <ul className="space-y-2 border-l border-black/[0.06] pl-4">
                       {toc.map((item) => (
                         <li key={item.id}>
-                          <a 
+                          <a
                             href={`#${item.id}`}
-                            className="text-[#6B7280] hover:text-[#00B67A] font-medium text-sm transition-colors"
+                            className="text-ink-500 hover:text-brand-primary font-medium text-[13px] transition-colors block leading-snug"
                           >
                             {item.title}
                           </a>
@@ -145,15 +153,15 @@ export default async function BlogPost({ params }) {
                 {/* RELATED POSTS */}
                 {relatedPosts.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest mb-6">Related Posts</h4>
-                    <div className="space-y-8">
+                    <h4 className="text-[10px] font-semibold text-ink-400 uppercase tracking-[0.16em] mb-3">Related</h4>
+                    <div className="space-y-4">
                       {relatedPosts.map((p) => (
                         <div key={p.slug} className="group">
                           <Link href={`/blog/${p.slug}`}>
-                            <span className="text-[10px] font-bold text-[#00B67A] uppercase tracking-widest mb-2 block">
+                            <span className="text-[9px] font-bold text-brand-primary uppercase tracking-[0.14em] mb-1 block">
                               {p.category}
                             </span>
-                            <h5 className="font-bold text-[#0A0F1E] group-hover:text-[#00B67A] transition-colors leading-snug">
+                            <h5 className="font-semibold text-ink-900 group-hover:text-brand-primary transition-colors leading-snug text-[13px]">
                               {p.title}
                             </h5>
                           </Link>

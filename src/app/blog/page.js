@@ -13,21 +13,29 @@ export default function BlogIndex() {
   const allPosts = getBlogPosts();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-white">
       <Navbar />
-      <main className="flex-grow pt-32 pb-20">
-        
+      <main className="flex-grow">
+
         {/* HERO */}
-        <section className="px-6 lg:px-8 max-w-7xl mx-auto text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-serif text-[#0A0F1E] mb-6">
-            The HireNP Blog
-          </h1>
-          <p className="text-[#6B7280] text-lg md:text-xl font-medium max-w-3xl mx-auto">
-            Hiring intelligence, AI trends, and practical guides for modern teams.
-          </p>
+        <section className="relative pt-28 pb-12 lg:pt-32 lg:pb-16 px-5 lg:px-6 overflow-hidden">
+          <div className="absolute inset-0 bg-grid mask-radial opacity-60 pointer-events-none" />
+          <div className="relative max-w-3xl mx-auto text-center">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.16em] uppercase text-brand-primary mb-3">
+              <span className="w-3 h-px bg-brand-primary/50" /> Blog
+            </span>
+            <h1 className="text-3xl md:text-5xl font-serif text-ink-900 mb-3 leading-[1.05] tracking-[-0.025em] text-balance">
+              The HireNP blog.
+            </h1>
+            <p className="text-ink-500 text-[15px] max-w-xl mx-auto leading-relaxed">
+              Hiring intelligence, AI trends, and practical guides for modern teams.
+            </p>
+          </div>
         </section>
 
-        <BlogList allPosts={allPosts} />
+        <div className="py-10 lg:py-12 pb-20">
+          <BlogList allPosts={allPosts} />
+        </div>
 
       </main>
       <Footer />
