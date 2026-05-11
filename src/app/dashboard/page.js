@@ -15,8 +15,17 @@ import {
   FileCheck,
   TrendingUp,
   ChevronRight,
-  Circle
+  Circle,
+  Eye,
+  Archive,
+  MoreVertical
 } from 'lucide-react';
+
+const JOBS = [
+  { id: 1, title: "Senior Product Designer", dept: "Design", location: "Remote", applicants: 24, status: "Active" },
+  { id: 2, title: "Frontend Engineer (React)", dept: "Engineering", location: "Remote", applicants: 42, status: "Active" },
+  { id: 3, title: "Product Manager", dept: "Product", location: "Remote", applicants: 18, status: "Active" },
+];
 
 const stats = [
   { label: 'JOBS', value: '8', icon: Briefcase, color: 'text-blue-500', bg: 'bg-blue-50' },
@@ -155,6 +164,53 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Recent Jobs Section */}
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-black text-slate-800 tracking-tight">Active Job Listings</h2>
+                <p className="text-[10px] font-black text-slate-400 tracking-[0.15em] uppercase">Manage your open positions</p>
+              </div>
+              <button className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 tracking-widest uppercase hover:text-emerald-600 transition-colors">
+                All Jobs <ChevronRight size={14} />
+              </button>
+            </div>
+            <div className="bg-white rounded-[2.5rem] border border-slate-50 shadow-sm overflow-hidden">
+              <div className="divide-y divide-slate-50">
+                {JOBS.map((job) => (
+                  <div key={job.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 transition-colors cursor-pointer group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 font-bold group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-colors">
+                        {job.title.charAt(0)}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800">{job.title}</h4>
+                        <p className="text-[10px] font-black text-slate-400 tracking-wider uppercase">{job.dept} • {job.location}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="text-right">
+                        <p className="font-black text-slate-800">{job.applicants}</p>
+                        <p className="text-[9px] font-black text-slate-400 tracking-widest uppercase">Applicants</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="p-2 rounded-xl hover:bg-white hover:shadow-sm text-slate-400 hover:text-blue-500 transition-all">
+                          <Eye size={18} />
+                        </button>
+                        <button className="p-2 rounded-xl hover:bg-white hover:shadow-sm text-slate-400 hover:text-orange-500 transition-all">
+                          <BarChart3 size={18} />
+                        </button>
+                        <button className="p-2 rounded-xl hover:bg-white hover:shadow-sm text-slate-400 hover:text-rose-500 transition-all">
+                          <Archive size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
 
         {/* Right Column (3/12) - Setup Checklist */}

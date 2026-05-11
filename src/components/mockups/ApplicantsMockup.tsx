@@ -1,12 +1,16 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { Search, SlidersHorizontal, Check, AlertTriangle, X } from 'lucide-react';
+import { Search, SlidersHorizontal, Check, AlertTriangle, X, Eye, BarChart3, Archive, MoreVertical } from 'lucide-react';
 
 const APPLICANTS = [
   { name: "Alex Morgan", initials: "AM", role: "Senior Product Designer", score: 94, status: "Strong match", tone: "good" as const, flags: 0 },
   { name: "Priya Sharma", initials: "PS", role: "Senior Product Designer", score: 87, status: "Good fit", tone: "good" as const, flags: 0 },
   { name: "Jordan Kim", initials: "JK", role: "Senior Product Designer", score: 67, status: "Review", tone: "warn" as const, flags: 1 },
   { name: "Sam Rivera", initials: "SR", role: "Senior Product Designer", score: 34, status: "Weak fit", tone: "bad" as const, flags: 3 },
+  { name: "Maya Chen", initials: "MC", role: "Senior Product Designer", score: 92, status: "Strong match", tone: "good" as const, flags: 0 },
+  { name: "Liam Wilson", initials: "LW", role: "Senior Product Designer", score: 78, status: "Good fit", tone: "good" as const, flags: 0 },
+  { name: "Sarah Connor", initials: "SC", role: "Senior Product Designer", score: 45, status: "Weak fit", tone: "bad" as const, flags: 2 },
+  { name: "David Miller", initials: "DM", role: "Senior Product Designer", score: 81, status: "Good fit", tone: "good" as const, flags: 0 },
 ];
 
 const ApplicantsMockup = () => {
@@ -87,7 +91,7 @@ const ApplicantsMockup = () => {
       </div>
 
       {/* Rows */}
-      <div className="px-4 pb-4 space-y-1.5">
+      <div className="px-4 pb-4 space-y-1.5 max-h-[260px] overflow-y-auto custom-scrollbar">
         {APPLICANTS.map((a, i) => {
           const isScored = i < scored;
           const t = toneClasses[a.tone];
@@ -135,6 +139,19 @@ const ApplicantsMockup = () => {
               }`}>
                 {isScored ? t.icon : null}
                 {isScored ? a.status : 'Pending'}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-1 ml-2">
+                <button className="p-1.5 rounded-md hover:bg-emerald-50 text-ink-400 hover:text-brand-primary transition-all">
+                  <Eye size={14} />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-amber-50 text-ink-400 hover:text-amber-500 transition-all">
+                  <BarChart3 size={14} />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-rose-50 text-ink-400 hover:text-rose-500 transition-all">
+                  <Archive size={14} />
+                </button>
               </div>
             </div>
           );

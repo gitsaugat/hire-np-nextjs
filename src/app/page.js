@@ -4,18 +4,25 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import InterviewMockup from '@/components/mockups/InterviewMockup';
+import InterviewIntelligenceMockup from '@/components/mockups/InterviewIntelligenceMockup';
+import InterviewCallMockup from '@/components/mockups/InterviewCallMockup';
 import DashboardMockup from '@/components/mockups/DashboardMockup';
 import ApplicantsMockup from '@/components/mockups/ApplicantsMockup';
 import OfferMockup from '@/components/mockups/OfferMockup';
-import EmmaMockup from '@/components/mockups/EmmaMockup';
 import CandidateMockup from '@/components/mockups/CandidateMockup';
 import AIJobArchitectMockup from '@/components/mockups/AIJobArchitectMockup';
 import InterviewHubMockup from '@/components/mockups/InterviewHubMockup';
+import SchedulingBlocksMockup from '@/components/mockups/SchedulingBlocksMockup';
+import CandidateSchedulingMockup from '@/components/mockups/CandidateSchedulingMockup';
+import CandidatePoolMockup from '@/components/mockups/CandidatePoolMockup';
+import TeamManagementMockup from '@/components/mockups/TeamManagementMockup';
+import EmailTrackingMockup from '@/components/mockups/EmailTrackingMockup';
+import OnboardingIntegrationsMockup from '@/components/mockups/OnboardingIntegrationsMockup';
 import {
   Check, Zap, Calendar, Brain, Mic, ArrowRight, ArrowUpRight,
   Sparkles, Eye, Users2, Workflow, MessageSquareText, FileSignature,
-  Building2, UserRound, ShieldCheck, Globe2
+  Building2, UserRound, ShieldCheck, Globe2, Clock, Send, Video,
+  Archive, BarChart3, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -101,7 +108,7 @@ const MockupFrame = ({ children, badge, badgePosition = 'top-right' }) => (
 const HOW_STEPS = [
   {
     num: "01",
-    short: "Post a job",
+    short: "Post job",
     title: "Post a job in 2 minutes",
     text: "Describe the role in plain English. AI builds the description, requirements, and scoring criteria automatically.",
     badge: "AI builds the job",
@@ -109,36 +116,78 @@ const HOW_STEPS = [
   },
   {
     num: "02",
-    short: "AI screens",
+    short: "Schedule",
+    title: "Type to manage your calendar",
+    text: "Connect Google Calendar and type in plain English. AI creates interview blocks, handles conflicts, and syncs instantly.",
+    badge: "AI block scheduling",
+    mockup: <SchedulingBlocksMockup />,
+    bullets: [
+      { icon: <Calendar size={12} />, label: "Google Calendar sync" },
+      { icon: <MessageSquareText size={12} />, label: "Natural language blocks" },
+      { icon: <Clock size={12} />, label: "Conflict resolution" },
+      { icon: <Zap size={12} />, label: "Instant team update" },
+    ],
+  },
+  {
+    num: "03",
+    short: "AI screen",
     title: "AI screens every applicant",
     text: "Every resume scored and ranked the moment it arrives. Full reasoning on every decision. No pile. No guessing.",
     badge: "Scored instantly",
     mockup: <ApplicantsMockup />,
   },
   {
-    num: "03",
-    short: "Multi-step interviews",
+    num: "04",
+    short: "Candidate",
+    title: "Top 5 picks for every candidate",
+    text: "Candidates select from matched slots or chat with AI to reschedule. A frictionless experience that wins top talent.",
+    badge: "Candidate selection",
+    mockup: <CandidateSchedulingMockup />,
+    bullets: [
+      { icon: <Sparkles size={12} />, label: "Top 5 AI matches" },
+      { icon: <Video size={12} />, label: "One-click confirmation" },
+      { icon: <Users2 size={12} />, label: "AI rescheduling chat" },
+      { icon: <Check size={12} />, label: "Auto-calendar invites" },
+    ],
+  },
+  {
+    num: "05",
+    short: "Interviews",
     title: "Multi-step interviews, end to end",
     text: "Screening, technical, culture, final — schedule and run every round in one place. Each stage scored independently.",
     badge: "Multi-stage pipeline",
     mockup: <InterviewHubMockup />,
   },
   {
-    num: "04",
-    short: "Interview intelligence",
-    title: "AI joins every call. Deep analysis on every candidate.",
-    text: "Auto-transcribed. Communication, technical, and culture fit scored. Red flags surfaced. Full summary before the debrief.",
-    badge: "Live AI analysis",
-    mockup: <InterviewMockup status="advance" />,
+    num: "06",
+    short: "Live Call",
+    title: "AI joins your Google Meet or Zoom",
+    text: "Never take notes again. HireNP joins every call automatically to transcribe, score, and flag key moments.",
+    badge: "AI Live Listener",
+    mockup: <InterviewCallMockup />,
     bullets: [
-      { icon: <Mic size={12} />, label: "Auto-joins Google Meet" },
-      { icon: <Brain size={12} />, label: "Communication + culture score" },
-      { icon: <Eye size={12} />, label: "Red flag detection" },
-      { icon: <Sparkles size={12} />, label: "Summary before debrief" },
+      { icon: <Video size={12} />, label: "Auto-joins Meet/Zoom" },
+      { icon: <Brain size={12} />, label: "Real-time signals" },
+      { icon: <Sparkles size={12} />, label: "Live transcription" },
+      { icon: <Mic size={12} />, label: "Audio-native capture" },
     ],
   },
   {
-    num: "05",
+    num: "07",
+    short: "Intelligence",
+    title: "Deep analysis on every candidate",
+    text: "Auto-transcribed. Communication, technical, and culture fit scored. Red flags surfaced. Full summary before the debrief.",
+    badge: "Post Interview Analysis",
+    mockup: <InterviewIntelligenceMockup />,
+    bullets: [
+      { icon: <Mic size={12} />, label: "Voice mode analysis" },
+      { icon: <Brain size={12} />, label: "Soft skill scoring" },
+      { icon: <Eye size={12} />, label: "Red flag detection" },
+      { icon: <Sparkles size={12} />, label: "Post-call summary" },
+    ],
+  },
+  {
+    num: "08",
     short: "Sign offer",
     title: "Offer to onboard in one click",
     text: "Generate offer letter with live preview. Candidate signs digitally. Done. No separate tools needed.",
@@ -152,7 +201,7 @@ const HowItWorksCard = () => {
   const [progress, setProgress] = useState(0);
   const [paused, setPaused] = useState(false);
 
-  const DURATION = 6000; // ms per step
+  const DURATION = 8000; // ms per step
 
   useEffect(() => {
     if (paused) return;
@@ -180,23 +229,23 @@ const HowItWorksCard = () => {
   return (
     <motion.div
       {...fade}
-      className="relative rounded-2xl border border-black/[0.06] bg-white shadow-sm overflow-hidden"
+      className="card relative overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       {/* Step tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 border-b border-black/[0.06]">
+      <div className="flex flex-nowrap overflow-x-auto no-scrollbar border-b border-black/[0.06]">
         {HOW_STEPS.map((s, i) => {
           const isActive = i === active;
           return (
             <button
               key={i}
               onClick={() => handleClick(i)}
-              className={`group relative px-3.5 py-3.5 text-left transition-colors border-b border-black/[0.06] lg:border-b-0 ${
+              className={`group relative flex-1 min-w-[110px] sm:min-w-[130px] lg:min-w-0 px-2.5 py-3 text-left transition-colors ${
                 isActive ? 'bg-[#FAFAF7]' : 'bg-white hover:bg-[#FAFAF7]/50'
-              } ${i < HOW_STEPS.length - 1 ? 'lg:border-r' : ''} ${i % 2 === 0 ? 'sm:border-r' : ''} sm:[&:nth-child(3n)]:border-r lg:[&:nth-child(3n)]:border-r-0`}
+              } ${i < HOW_STEPS.length - 1 ? 'border-r border-black/[0.06]' : ''}`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <span className={`shrink-0 w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold tracking-tight transition-all ${
                   isActive
                     ? 'bg-brand-primary text-white'
@@ -205,7 +254,7 @@ const HowItWorksCard = () => {
                   {s.num}
                 </span>
                 <div className="min-w-0">
-                  <p className={`text-[11px] font-semibold tracking-tight truncate transition-colors ${isActive ? 'text-ink-900' : 'text-ink-500'}`}>
+                  <p className={`text-[10px] font-semibold tracking-tight truncate transition-colors ${isActive ? 'text-ink-900' : 'text-ink-500'}`}>
                     {s.short}
                   </p>
                 </div>
@@ -226,15 +275,15 @@ const HowItWorksCard = () => {
       </div>
 
       {/* Content */}
-      <div className="grid lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-10 p-6 lg:p-10">
-        <AnimatePresence mode="wait">
+      <div className="grid lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-10 p-6 lg:p-10 min-h-[580px] relative">
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={`text-${active}`}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col justify-center"
+            initial={{ opacity: 0, x: 30, filter: "blur(8px)" }}
+            animate={{ opacity: 1, x: 0, filter: "blur(0px)", y: 0 }}
+            exit={{ opacity: 0, x: -40, y: -20, filter: "blur(12px)" }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col justify-center relative z-10"
           >
             <span className="text-[10px] font-semibold text-ink-300 tracking-[0.18em] mb-3">STEP {step.num} OF {HOW_STEPS.length.toString().padStart(2,'0')}</span>
             <h3 className="text-xl md:text-2xl lg:text-3xl font-serif text-ink-900 mb-3 leading-tight tracking-[-0.02em]">{step.title}</h3>
@@ -267,25 +316,22 @@ const HowItWorksCard = () => {
           </motion.div>
         </AnimatePresence>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`mockup-${active}`}
-            initial={{ opacity: 0, scale: 0.98, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: -8 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="relative"
-          >
-            <div className="absolute -inset-4 bg-gradient-to-br from-emerald-100/40 via-transparent to-transparent rounded-2xl blur-2xl pointer-events-none" />
-            <div className="relative">
-              <div className="absolute top-3 right-3 z-20 bg-white border border-black/[0.06] px-2 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
-                <span className="w-1 h-1 rounded-full bg-brand-primary animate-soft-pulse" />
-                <span className="text-[9px] font-semibold text-ink-700 tracking-wide">{step.badge}</span>
-              </div>
-              {step.mockup}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+        <div className="relative z-10">
+          <MockupFrame badge={step.badge}>
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={`mockup-${active}`}
+                initial={{ opacity: 0, x: 40, filter: "blur(12px)", scale: 0.98 }}
+                animate={{ opacity: 1, x: 0, filter: "blur(0px)", scale: 1, y: 0 }}
+                exit={{ opacity: 0, x: -50, y: -30, filter: "blur(20px)", scale: 1.05 }}
+                transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+                className="h-full w-full"
+              >
+                {step.mockup}
+              </motion.div>
+            </AnimatePresence>
+          </MockupFrame>
+        </div>
       </div>
     </motion.div>
   );
@@ -302,8 +348,10 @@ const EmmaChatDemo = () => {
   const [idx, setIdx] = useState(0);
   const [typed, setTyped] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
+    if (!isOpen) return;
     setTyped("");
     setShowAnswer(false);
     const query = EMMA_QUERIES[idx].q;
@@ -318,14 +366,47 @@ const EmmaChatDemo = () => {
       }
     }, 35);
     return () => clearInterval(typing);
-  }, [idx]);
+  }, [idx, isOpen]);
 
   return (
     <div className="relative">
       <div className="absolute -inset-6 bg-gradient-to-br from-emerald-100/40 via-transparent to-transparent rounded-3xl blur-2xl pointer-events-none" />
-      <div className="relative rounded-2xl border border-black/[0.06] bg-white shadow-sm overflow-hidden">
+      
+      {/* Emma "Chick" Floating Bubble */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            onClick={() => setIsOpen(true)}
+            className="absolute bottom-4 right-4 z-[70] w-14 h-14 rounded-full bg-gradient-to-br from-brand-primary to-brand-bright shadow-lg shadow-emerald-200 flex items-center justify-center text-white text-2xl font-black cursor-pointer group"
+          >
+            <span className="group-hover:scale-110 transition-transform">E</span>
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 border-2 border-white rounded-full" />
+            <motion.div 
+              animate={{ scale: [1, 1.2, 1] }} 
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="absolute -inset-1 rounded-full border border-brand-primary/30" 
+            />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <motion.div 
+        initial={false}
+        animate={{ 
+          height: isOpen ? 'auto' : '60px',
+          opacity: isOpen ? 1 : 0.6,
+          scale: isOpen ? 1 : 0.95,
+        }}
+        className="relative rounded-2xl border border-black/[0.06] bg-white shadow-sm overflow-hidden"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-black/[0.06] bg-[#FAFAF7]">
+        <div 
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center justify-between px-4 py-3 border-b border-black/[0.06] bg-[#FAFAF7] cursor-pointer"
+        >
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-primary to-brand-bright flex items-center justify-center text-white font-bold text-[11px]">E</div>
             <div>
@@ -335,73 +416,154 @@ const EmmaChatDemo = () => {
               </p>
             </div>
           </div>
-          <Sparkles size={13} className="text-brand-primary" />
+          <div className="flex items-center gap-2">
+            <Sparkles size={13} className="text-brand-primary" />
+            <ChevronRight size={14} className={`text-ink-300 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+          </div>
         </div>
 
-        {/* Chat body */}
-        <div className="p-4 space-y-3 min-h-[260px]">
-          <AnimatePresence mode="wait">
+        <AnimatePresence>
+          {isOpen && (
             <motion.div
-              key={`q-${idx}`}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.25 }}
-              className="flex justify-end"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
             >
-              <div className="max-w-[85%] px-3 py-2 rounded-2xl rounded-br-sm bg-brand-primary text-white text-[13px] font-medium leading-relaxed">
-                {typed}<span className="inline-block w-[2px] h-3.5 bg-white/80 ml-0.5 animate-soft-pulse align-middle" />
-              </div>
-            </motion.div>
-          </AnimatePresence>
+              {/* Chat body */}
+              <div className="p-4 space-y-3 min-h-[260px] relative">
+                <AnimatePresence mode="popLayout">
+                  <motion.div
+                    key={`q-${idx}`}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex justify-end"
+                  >
+                    <div className="max-w-[85%] px-3 py-2 rounded-2xl rounded-br-sm bg-brand-primary text-white text-[13px] font-medium leading-relaxed">
+                      {typed}<span className="inline-block w-[2px] h-3.5 bg-white/80 ml-0.5 animate-soft-pulse align-middle" />
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
 
-          {showAnswer && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex items-start gap-2"
-            >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-primary to-brand-bright flex items-center justify-center text-white font-bold text-[10px] shrink-0 mt-0.5">E</div>
-              <div className="max-w-[85%] px-3 py-2 rounded-2xl rounded-bl-sm bg-[#FAFAF7] border border-black/[0.04] text-[13px] text-ink-700 font-medium leading-relaxed">
-                {EMMA_QUERIES[idx].a}
+                {showAnswer && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex items-start gap-2 relative z-10"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-primary to-brand-bright flex items-center justify-center text-white font-bold text-[10px] shrink-0 mt-0.5">E</div>
+                    <div className="max-w-[85%] px-3 py-2 rounded-2xl rounded-bl-sm bg-[#FAFAF7] border border-black/[0.04] text-[13px] text-ink-700 font-medium leading-relaxed">
+                      {EMMA_QUERIES[idx].a}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Input area */}
+              <div className="px-4 pb-4">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-black/[0.06] bg-[#FAFAF7]">
+                  <input
+                    readOnly
+                    placeholder="Ask Emma about your pipeline..."
+                    className="flex-1 bg-transparent text-[12px] text-ink-500 outline-none font-medium placeholder:text-ink-300"
+                  />
+                  <button className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-white shadow-brand">
+                    <ArrowRight size={12} />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  {EMMA_QUERIES.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setIdx(i)}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all ${
+                        i === idx
+                          ? 'bg-emerald-50 border border-emerald-100 text-brand-primary'
+                          : 'bg-white border border-black/[0.06] text-ink-400 hover:text-ink-700'
+                      }`}
+                    >
+                      Suggestion {i + 1}
+                    </button>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}
-        </div>
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  );
+};
 
-        {/* Input area */}
-        <div className="px-4 pb-4">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-black/[0.06] bg-[#FAFAF7]">
-            <input
-              readOnly
-              placeholder="Ask Emma about your pipeline..."
-              className="flex-1 bg-transparent text-[12px] text-ink-500 outline-none font-medium placeholder:text-ink-300"
-            />
-            <button className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-white shadow-brand">
-              <ArrowRight size={12} />
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-1.5 mt-2.5">
-            {EMMA_QUERIES.map((q, i) => (
-              <button
-                key={i}
-                onClick={() => setIdx(i)}
-                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all ${
-                  i === idx
-                    ? 'bg-emerald-50 border border-emerald-100 text-brand-primary'
-                    : 'bg-white border border-black/[0.06] text-ink-400 hover:text-ink-700'
-                }`}
-              >
-                Suggestion {i + 1}
-              </button>
-            ))}
-          </div>
-        </div>
+const HeroShowcase = () => {
+  const [active, setActive] = useState(0);
+  const showcaseSteps = [
+    { id: 'emma-chat', name: "Emma AI", component: <EmmaChatDemo />, badge: "AI Assistant" },
+    { id: 'intelligence', name: "Post Interview Analysis", component: <InterviewIntelligenceMockup />, badge: "Post Interview Analysis" },
+    { id: 'ai-architect', name: "AI Job Architect", component: <AIJobArchitectMockup />, badge: "AI Generation" },
+    { id: 'applicants', name: "AI Screening", component: <ApplicantsMockup />, badge: "AI Scoring" },
+    { id: 'scheduling', name: "Natural Language Scheduling", component: <SchedulingBlocksMockup />, badge: "AI Scheduling" },
+    { id: 'interview-call', name: "Live Interview", component: <InterviewCallMockup />, badge: "AI Live Listener" },
+    { id: 'candidate-scheduling', name: "Candidate Experience", component: <CandidateSchedulingMockup />, badge: "Candidate Selection" },
+    { id: 'interview-hub', name: "Interview Hub", component: <InterviewHubMockup />, badge: "Pipeline Management" },
+    { id: 'offer', name: "Offer Engine", component: <OfferMockup />, badge: "Offer Generation" },
+    { id: 'email', name: "Email Tracking", component: <EmailTrackingMockup />, badge: "Email Intelligence" },
+    { id: 'pool', name: "Candidate Pool", component: <CandidatePoolMockup />, badge: "Talent Rediscovery" },
+    { id: 'team', name: "HR Management", component: <TeamManagementMockup />, badge: "Team Collaboration" },
+    { id: 'integrations', name: "Tools Integration", component: <OnboardingIntegrationsMockup />, badge: "Auto-Onboarding" },
+  ];
+
+  useEffect(() => {
+    if (active >= showcaseSteps.length) {
+      setActive(0);
+    }
+    const timer = setInterval(() => {
+      setActive((prev) => (prev + 1) % showcaseSteps.length);
+    }, 5500);
+    return () => clearInterval(timer);
+  }, [showcaseSteps.length, active]);
+
+  const activeStep = showcaseSteps[active] || showcaseSteps[0];
+
+  if (!activeStep) return null;
+
+  return (
+    <div className="relative group w-full max-w-2xl mx-auto">
+      <div className="absolute -inset-8 bg-gradient-to-br from-emerald-100/60 via-emerald-50/40 to-transparent rounded-3xl blur-2xl pointer-events-none" />
+      
+      <div className="relative transform transition-all duration-1000 hover:scale-[1.01]">
+        <MockupFrame badge={activeStep.badge}>
+          <AnimatePresence mode="popLayout">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, x: 40, filter: "blur(12px)", scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)", scale: 1, y: 0 }}
+              exit={{ opacity: 0, x: -50, y: -30, filter: "blur(20px)", scale: 1.05 }}
+              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full w-full overflow-hidden"
+            >
+              {activeStep.component}
+            </motion.div>
+          </AnimatePresence>
+        </MockupFrame>
+      </div>
+
+      {/* Manual Controls on Hover */}
+      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+        {showcaseSteps.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(i)}
+            className={`w-2 h-2 rounded-full transition-all ${active === i ? 'bg-brand-primary w-6' : 'bg-ink-200'}`}
+          />
+        ))}
       </div>
     </div>
   );
 };
+
 
 export default function Home() {
   return (
@@ -455,14 +617,7 @@ export default function Home() {
               transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="relative"
             >
-              <div className="absolute -inset-8 bg-gradient-to-br from-emerald-100/60 via-emerald-50/40 to-transparent rounded-3xl blur-2xl pointer-events-none" />
-              <div className="relative animate-float">
-                <div className="absolute -top-2 -left-2 z-20 bg-white border border-black/[0.06] px-2 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
-                  <span className="w-1 h-1 rounded-full bg-red-500" />
-                  <span className="text-[10px] font-semibold text-ink-700 tracking-wide">AI explains every decision</span>
-                </div>
-                <InterviewMockup status="reject" />
-              </div>
+              <HeroShowcase />
             </motion.div>
           </div>
         </section>

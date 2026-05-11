@@ -117,7 +117,7 @@ export default function Pricing() {
               <motion.div
                 key={i} {...fade}
                 transition={{ delay: i * 0.05, duration: 0.4 }}
-                className={`relative flex flex-col p-6 rounded-2xl bg-white ${
+                className={`relative flex flex-col h-full p-6 rounded-2xl bg-white ${
                   plan.featured
                     ? 'border border-brand-primary/40 shadow-[0_1px_0_rgba(0,182,122,0.06),0_16px_40px_-16px_rgba(0,182,122,0.25)]'
                     : 'border border-black/[0.06] shadow-xs'
