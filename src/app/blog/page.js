@@ -5,8 +5,24 @@ import { getBlogPosts } from '@/lib/blog/utils';
 import BlogList from './BlogList';
 
 export const metadata = {
-  title: "HireNP Blog — Hiring Intelligence & AI Hiring Guides",
-  description: "Practical guides on AI hiring, startup recruiting, HR strategy, and how to hire faster with less effort.",
+  title: 'HireNP Blog — AI Hiring Nepal, Recruitment Tips & HR Strategy 2026',
+  description:
+    'Practical guides on AI hiring in Nepal, startup recruitment, replacing agencies with software, and building better hiring processes. Updated 2026.',
+  keywords: [
+    'hiring tips Nepal',
+    'AI recruitment Nepal blog',
+    'HR strategy Nepal',
+    'recruitment guide Nepal 2026',
+    'how to hire Nepal',
+    'startup hiring tips',
+  ],
+  alternates: { canonical: 'https://hire-np.com/blog' },
+  openGraph: {
+    title: 'HireNP Blog — AI Hiring Nepal & HR Strategy 2026',
+    description:
+      'Guides on AI hiring in Nepal, startup recruitment, replacing agencies, and modern hiring processes.',
+    url: 'https://hire-np.com/blog',
+  },
 };
 
 export default function BlogIndex() {

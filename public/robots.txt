@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
 
 Sitemap: https://hire-np.com/sitemap.xml
+
+Host: https://hire-np.com

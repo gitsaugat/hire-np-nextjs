@@ -571,6 +571,24 @@ export default function Home() {
       <Navbar />
       <main className="flex-grow">
 
+        {/* SEO-only context for crawlers and screen readers */}
+        <section aria-label="About HireNP" className="sr-only">
+          <h2>HireNP — AI Hiring Software for Nepal and USA</h2>
+          <p>
+            HireNP is an AI-native hiring intelligence platform built for companies in Nepal and the USA.
+            The platform screens resumes with AI reasoning, joins interviews on Google Meet to transcribe
+            and score conversations, schedules candidates in natural language, and generates offer letters
+            automatically. Nepal companies pay in NPR using eSewa or Khalti — Pay Per Job NPR 4,000, Pro
+            NPR 19,900 per 30 days, Business NPR 26,600 per 30 days. USA companies pay in USD via Stripe —
+            Pay Per Job $60, Pro $299 per 30 days, Business $400 per 30 days. Every plan includes a
+            15-day free trial with no credit card required. HireNP is an alternative to Merojob,
+            TalentSathi, Kumari Job, and Froxjob for Nepal teams, and to LinkedIn Recruiter, Greenhouse,
+            Lever, Workable, and Indeed for USA teams. The platform is the most advanced applicant
+            tracking system Nepal companies can adopt today, with full AI reasoning on every hiring decision
+            and Nepal Labour Act 2074 compliance on the Business plan.
+          </p>
+        </section>
+
         {/* SECTION 1 — HERO */}
         <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-24 px-5 lg:px-6 overflow-hidden">
           <div className="absolute inset-0 bg-grid mask-radial opacity-60 pointer-events-none" />

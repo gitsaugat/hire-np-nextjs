@@ -8,19 +8,39 @@ import { notFound } from 'next/navigation';
 import { MasterComparisonTable } from '@/components/blog/MasterComparisonTable';
 import { PricingComparison } from '@/components/blog/PricingComparison';
 import { HireNPAdvantage } from '@/components/blog/HireNPAdvantage';
+import { BlogPostSchema } from '@/components/schema/BlogPostSchema';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const post = getBlogPostBySlug(slug);
-  if (!post) return {};
+  if (!post) return { title: 'Post Not Found' };
+
+  const url = `https://hire-np.com/blog/${slug}`;
+  const keywords = [
+    ...(post.keywords || []),
+    'HireNP',
+    'hiring software Nepal',
+    'AI recruitment Nepal',
+  ];
 
   return {
     title: `${post.title} | HireNP Blog`,
     description: post.excerpt,
+    keywords,
+    authors: [{ name: 'HireNP Team' }],
+    alternates: { canonical: url },
     openGraph: {
       title: post.title,
       description: post.excerpt,
       type: 'article',
+      publishedTime: post.date,
+      url,
+      tags: post.keywords || [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
     },
   };
 }
@@ -70,6 +90,13 @@ export default async function BlogPost({ params }) {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
+      <BlogPostSchema
+        title={post.title}
+        excerpt={post.excerpt}
+        date={post.date}
+        slug={slug}
+        readTime={post.readTime}
+      />
       <Navbar />
       <main className="flex-grow pt-28 pb-16">
         <article className="max-w-6xl mx-auto px-5 lg:px-6">
