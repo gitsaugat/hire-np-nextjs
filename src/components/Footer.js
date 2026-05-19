@@ -46,8 +46,15 @@ const Footer = () => {
               <Image src="/logo.jpg" alt="HireNP" width={120} height={32} className="h-6 w-auto object-contain mix-blend-multiply" />
             </Link>
             <p className="text-ink-500 text-[13px] leading-relaxed max-w-xs">
-              AI-native hiring intelligence. One platform that explains every decision — from job post to signed offer.
+              #1 AI-native hiring platform in Nepal. One system that explains every decision — from job post to signed offer.
             </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[10px] text-ink-300 font-medium">
+              <span>AI Hiring Nepal</span>
+              <span>•</span>
+              <span>Hiring Platform Nepal</span>
+              <span>•</span>
+              <span>Merojob Alternative</span>
+            </div>
           </div>
 
           {Object.values(columns).map((col) => (
